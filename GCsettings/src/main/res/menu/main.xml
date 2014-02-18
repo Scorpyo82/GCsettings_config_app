@@ -1,0 +1,29 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="es.pccitos.gcsettings.MainActivity" >
+
+    <item
+        android:id="@+id/menu_list_apps"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/menu_list_apps"
+        android:orderInCategory="2"/>
+
+    <item
+        android:id="@+id/menu_aplicar"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/menu_aplicar"
+        android:orderInCategory="3"/>
+
+    <item
+        android:id="@+id/menu_salir"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/menu_salir"
+        android:orderInCategory="4"/>
+
+    <item android:id="@+id/menu_acercade"
+        android:title="@string/menu_acercade"
+        android:orderInCategory="4"
+        app:showAsAction="never" />
+
+</menu>

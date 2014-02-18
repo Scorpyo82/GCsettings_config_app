@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">gc-settings config</string>
+    <string name="cbActivar_bootanimation">Activar animación de encendido</string>
+    <string name="cbActivar_shutdownanimation">Activar animación de apagado</string>
+    <string name="cbActivar_swap">Activar soporte para Swap</string>
+    <string name="cbUpdatesToSystem">Activar updates2system</string>
+    <string name="btAplicar">Aplicar cambios</string>
+    <string name="btSalir">Salir</string>
+    <string name="tvInfo">* Este Valor se aplicará al reiniciar.</string>
+    <string name="cbText2sd_ext">*Montar /data en particón externa</string>
+    <string name="menu_list_apps">Lista de updates2system</string>
+    <string name="menu_aplicar">Aplicar cambios</string>
+    <string name="menu_salir">Salir</string>
+    <string name="title_activity_list_apps">Actualizaciones a /system</string>
+    <string name="cbCom.google.android.gms">Servicios de google play</string>
+    <string name="cbCom.buak.Link2SD">Link2SD (Mueve apps a la SD)"</string>
+    <string name="cbCom.android.vending">PlayStore (Antiguo Market)</string>
+    <string name="cbDev.ukanth.ufirewall">AFWall (Cortafuegos)</string>
+    <string name="title_activity_acercade">Acerca de</string>
+    <string name="menu_acercade">Acerca de</string>
+    <string name="tvCabeceraAcercade">Config gc-settings Ver: 1.0</string>
+    <string name="tvAcercaDeInfo">\"gc-settings config\" es una app que genera
+        una configuración que más tarde es interpretada por el
+        script \"gc-settings\",ejecutando este último dichas tareas.
+        Esta app es Freeware, su uso queda bajo su propia responsabilidad
+        no pudiendo reclamar a su desarrollador garantía alguna por problemas
+        que puediese ocosionarle. APP desarrollada por Miguel Ponce Torres,
+        y bajo licencia GNU GPL
+    </string>
+    <string name="CopyRight"><![CDATA[Copyright (C) <2014> <Miguel Ponce Torres>]]></string>
+    <string name="web_autor">www.pc-citos.es</string>
+
+</resources>

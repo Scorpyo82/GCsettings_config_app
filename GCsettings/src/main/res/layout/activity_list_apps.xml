@@ -1,0 +1,55 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="es.pccitos.gcsettings.ActivityListApps"
+    tools:ignore="MergeRootFrame"
+    android:background="@color/ColorFondo" >
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@color/ColorFondo">
+
+        <CheckBox
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/cbCom.android.vending"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:textColor="@color/cbColorText"
+            android:id="@+id/cbCom.android.vending" />
+
+        <CheckBox
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/cbCom.google.android.gms"
+            android:id="@+id/cbCom.google.android.gms"
+            android:textColor="@color/cbColorText"
+            android:layout_below="@+id/cbCom.android.vending"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <CheckBox
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/cbCom.buak.Link2SD"
+            android:id="@+id/cbCom.buak.Link2SD"
+            android:textColor="@color/cbColorText"
+            android:layout_below="@+id/cbCom.google.android.gms"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <CheckBox
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/cbDev.ukanth.ufirewall"
+            android:id="@+id/cbDev.ukanth.ufirewall"
+            android:textColor="@color/cbColorText"
+            android:layout_below="@+id/cbCom.buak.Link2SD"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+    </RelativeLayout>
+</FrameLayout>

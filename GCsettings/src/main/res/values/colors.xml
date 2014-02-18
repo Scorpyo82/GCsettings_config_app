@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ColorFondo">#010101</color>
+    <color name="cbColorText">#ffffff</color>
+    <color name="tvColorOptions">#ffffff</color>
+    <color name="ColorInfo">#ff1111</color>
+    <color name="Azul_oscuro">#000b73</color>
+</resources>
