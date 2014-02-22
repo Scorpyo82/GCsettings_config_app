@@ -3,8 +3,12 @@ package es.pccitos.gcsettings;
 import android.support.v7.app.ActionBarActivity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Toast;
+
+import java.io.IOException;
 
 public class OTA_Settings extends ActionBarActivity {
 
@@ -28,7 +32,26 @@ public class OTA_Settings extends ActionBarActivity {
         //Se le aplica el valor booleano correspondiente a cada clave leida
         cbActivateOta.setChecked(VG_AUTO_CHECK_OTA);
 
+
+        //Declaración de los botones
+
+        Button btCheckUpdate = (Button) findViewById(R.id.btCheckUpdates);
+
+        //Eventos de los botones Aplicar y salir
+
+        btCheckUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                metodoSearch();
+
+            }
+        });
+
     }
+
+
+
 
     /**
      * A placeholder fragment containing a simple view.
@@ -58,9 +81,27 @@ public class OTA_Settings extends ActionBarActivity {
         editor.commit();
 
         //Se muestra el mensaje de que se han guardado los cambios
-        Toast.makeText(getBaseContext(), "Lista de paquetes guardada", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getBaseContext(), "Guardando", Toast.LENGTH_SHORT).show();
 
 
     }
+
+    public void metodoSearch(){
+
+
+        // Ejecutamos un comando en modo root. Esto es lo que hace que nos aparezca
+        // el superuser pidiendo confirmación.
+        try {
+            String [] cmd = {"su","-c","/system/xbin/gc-ota","--upgrade"};
+            Runtime.getRuntime().exec(cmd);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Toast.makeText(getBaseContext(), "¡Se están realizando las tareas!", Toast.LENGTH_SHORT).show();
+
+
+    }
+
 
 }
