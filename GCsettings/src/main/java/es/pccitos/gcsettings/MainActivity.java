@@ -48,6 +48,7 @@ public class MainActivity extends ActionBarActivity {
 
         //Obtiene el objeto de ajustes de la aplicación llamado ajustesGC.
         SharedPreferences sharedPreferences = MainActivity.this.getSharedPreferences("ajustesGC", 0);
+        //SharedPreferences sharedPreferences = getSharedPreferences("ajustesGC", 0);
 
         //Obtenemos el booleano almacenado en las preferencias de nombre "inicializado".
         //El segundo parametro indica el valor a devolver si no lo encuentra, en este caso, falso.

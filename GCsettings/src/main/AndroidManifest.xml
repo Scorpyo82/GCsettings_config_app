@@ -28,6 +28,10 @@
             android:name="es.pccitos.gcsettings.OTA_Settings"
             android:label="@string/title_activity_ota__settings" >
         </activity>
+        <activity
+            android:name="es.pccitos.gcsettings.OtaInfo"
+            android:label="@string/title_activity_ota_info" >
+        </activity>
     </application>
 
 </manifest>

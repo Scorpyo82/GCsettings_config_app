@@ -1,0 +1,95 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="es.pccitos.gcsettings.OtaInfo"
+    tools:ignore="MergeRootFrame" >
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@color/ColorFondo">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/tvVersionActual"
+            android:id="@+id/tvVersionActual"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:textColor="@color/tvColorOptions" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/tvSinDatos"
+            android:id="@+id/tvMostrarVersion"
+            android:layout_below="@+id/tvVersionActual"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:textColor="@color/tvColorOptions" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/tvUpdateDetect"
+            android:id="@+id/tvUpdateOtaName"
+            android:layout_below="@+id/tvMostrarVersion"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="34dp"
+            android:textColor="@color/tvColorOptions" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/tvSinDatos"
+            android:id="@+id/tvMostrarUpdateOtaInfo"
+            android:layout_below="@+id/tvUpdateOtaName"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:textColor="@color/tvColorOptions" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btActualizar"
+            android:id="@+id/btActualizar"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btSalirOta"
+            android:id="@+id/btSalir"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/tvChanges"
+            android:id="@+id/tvChanges"
+            android:layout_below="@+id/tvMostrarUpdateOtaInfo"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="26dp"
+            android:textColor="@color/tvColorOptions" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/tvSinDatos"
+            android:id="@+id/tvMostrarCambios"
+            android:layout_below="@+id/tvChanges"
+            android:layout_alignRight="@+id/tvChanges"
+            android:layout_alignEnd="@+id/tvChanges"
+            android:layout_above="@+id/btActualizar"
+            android:textColor="@color/tvColorOptions" />
+    </RelativeLayout>
+</FrameLayout>

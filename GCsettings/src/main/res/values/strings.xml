@@ -39,5 +39,13 @@
         periódico de actualizaciones. Cuando una nueva actualización sea encontrada esta misma
         aplicación se lo notificará, le mostrará los datos de la nueva actualización y pedirá su
         confirmación para instalarse.</string>
+    <string name="title_activity_ota_info">Información ota</string>
+    <string name="tvVersionActual">Versión actual detectada:</string>
+    <string name="tvUpdateDetect">Actualización encontrada:</string>
+    <string name="tvCambiosOTA">Los cambios son:</string>
+    <string name="tvSinDatos">Sin datos...</string>
+    <string name="tvChanges">Cambios:</string>
+    <string name="btActualizar">Actualizar</string>
+    <string name="btSalirOta">Descartar</string>
 
 </resources>
