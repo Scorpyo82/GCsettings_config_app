@@ -21,7 +21,7 @@ import java.io.OutputStream;
 
 public class MainActivity extends ActionBarActivity {
 
-    //
+    //Opciones presentes en MainActivity
     public static String INICIALIZADO = "inicializado";
     public static String BOOTANIMATION = "bootanimation";
     public static String SHUTDOWNANIMATION = "shutdownanimation";
@@ -29,10 +29,14 @@ public class MainActivity extends ActionBarActivity {
     public static String OUPDATES2SYSTEM = "updates_to_system";
     public static String DATA2EXT = "data_to_ext";
 
+    //Opciones presentes en ActivityListApps
     public static String PLAYSTORE = "UPDATES2SYSTEM_APP_com.android.vending";
     public static String ANDROIDSERVICES = "UPDATES2SYSTEM_APP_com.google.android.gms";
     public static String LINK2SD = "UPDATES2SYSTEM_APP_com.buak.Link2SD";
     public static String FIREWALL = "UPDATES2SYSTEM_APP_dev.ukanth.ufirewall";
+
+    //Opciones presentes en MainActivity
+    public static String AUTO_CHECK_OTA = "auto_check_ota";
 
 
 
@@ -43,7 +47,7 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         //Obtiene el objeto de ajustes de la aplicación llamado ajustesGC.
-        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("ajustesGC", 0);
+        SharedPreferences sharedPreferences = MainActivity.this.getSharedPreferences("ajustesGC", 0);
 
         //Obtenemos el booleano almacenado en las preferencias de nombre "inicializado".
         //El segundo parametro indica el valor a devolver si no lo encuentra, en este caso, falso.
@@ -68,13 +72,14 @@ public class MainActivity extends ActionBarActivity {
             editor.putBoolean(ANDROIDSERVICES, true);
             editor.putBoolean(LINK2SD, true);
             editor.putBoolean(FIREWALL, true);
+            editor.putBoolean(AUTO_CHECK_OTA, false);
 
             //Tras haber indicado todos los cambios a realizar (en este caso una configuración por defecto) le
             //indicamos al editor que los almacene en las preferencias.
             editor.commit();
 
             //Se muestra un mensaje avisando de que es la primera vez que se ejecuta la app y que
-            //Deve especificar los valores que quiere ejecutar porque se a activado una configuración por defecto
+            //debe especificar los valores que quiere ejecutar porque se ha activado una configuración por defecto
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage("Esta es la primera vez que se usa esta aplicación, se cargará una configuración predeterminada que puede cambiar a su gusto, se necesitarán permisos de ROOT")
@@ -180,6 +185,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+
             case R.id.menu_list_apps:
 
                 Intent i = new Intent(this, ActivityListApps.class);
@@ -187,21 +193,28 @@ public class MainActivity extends ActionBarActivity {
 
                 return true;
 
+            case R.id.menu_opciones_ota:
+
+                Intent a = new Intent(this, OTA_Settings.class);
+                startActivity(a);
+                return true;
+
             case R.id.menu_aplicar:
 
                 metodoAplicar();
+                return true;
+
+            case R.id.menu_acercade:
+
+                Intent b = new Intent(this, Acercade.class);
+                startActivity(b);
+
                 return true;
 
             case R.id.menu_salir:
 
                 Toast.makeText(getBaseContext(), "Los cambios no aplicados serán ignorados", Toast.LENGTH_SHORT).show();
                 finish();
-                return true;
-            case R.id.menu_acercade:
-
-                Intent a = new Intent(this, Acercade.class);
-                startActivity(a);
-
                 return true;
 
 
@@ -286,7 +299,7 @@ public class MainActivity extends ActionBarActivity {
 
 
         //Obtiene el objeto de ajustes de la aplicación llamado ajustesGC.
-        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("ajustesGC", 0);
+        SharedPreferences sharedPreferences = MainActivity.this.getSharedPreferences("ajustesGC", 0);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         //Grabando las variables en las claves del fichero en sharedprefenrces

@@ -1,12 +1,10 @@
 package es.pccitos.gcsettings;
 
-
 import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.widget.CheckBox;
 import android.widget.Toast;
-
 
 public class ActivityListApps extends ActionBarActivity {
 
@@ -21,7 +19,7 @@ public class ActivityListApps extends ActionBarActivity {
         setContentView(R.layout.activity_list_apps);
 
         //Obtiene el objeto de ajustes de la aplicación llamado ajustesGC.
-        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("ajustesGC", 0);
+        SharedPreferences sharedPreferences = ActivityListApps.this.getSharedPreferences("ajustesGC", 0);
 
         //Declaración de los CheckBox
         final CheckBox cbPlaystore = (CheckBox) findViewById(R.id.cbCom_android_vending);
@@ -76,7 +74,7 @@ public class ActivityListApps extends ActionBarActivity {
 
 
 
-        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("ajustesGC", 0);
+        SharedPreferences sharedPreferences = ActivityListApps.this.getSharedPreferences("ajustesGC", 0);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         //Se graban los nuevos valores en sus claves correspondientes

@@ -24,6 +24,10 @@
             android:name="es.pccitos.gcsettings.Acercade"
             android:label="@string/title_activity_acercade" >
         </activity>
+        <activity
+            android:name="es.pccitos.gcsettings.OTA_Settings"
+            android:label="@string/title_activity_ota__settings" >
+        </activity>
     </application>
 
 </manifest>

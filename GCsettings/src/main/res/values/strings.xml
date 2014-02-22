@@ -10,8 +10,10 @@
     <string name="btSalir">Salir</string>
     <string name="tvInfo">* Este Valor se aplicará al reiniciar.</string>
     <string name="cbText2sd_ext">*Montar /data en particón externa</string>
-    <string name="menu_list_apps">Lista de updates2system</string>
+    <string name="menu_list_apps">Opciones de updates2system</string>
     <string name="menu_aplicar">Aplicar cambios</string>
+    <string name="menu_opciones_ota">Opciones OTA</string>
+    <string name="menu_acercade">Acerca de</string>
     <string name="menu_salir">Salir</string>
     <string name="title_activity_list_apps">Actualizaciones a /system</string>
     <string name="cbCom.google.android.gms">Servicios de google play</string>
@@ -19,7 +21,6 @@
     <string name="cbCom.android.vending">PlayStore (Antiguo Market)</string>
     <string name="cbDev.ukanth.ufirewall">AFWall (Cortafuegos)</string>
     <string name="title_activity_acercade">Acerca de</string>
-    <string name="menu_acercade">Acerca de</string>
     <string name="tvCabeceraAcercade">Config gc-settings Ver: 1.0</string>
     <string name="tvAcercaDeInfo">\"gc-settings config\" es una app que genera
         una configuración que más tarde es interpretada por el
@@ -27,9 +28,16 @@
         Esta app es Freeware, su uso queda bajo su propia responsabilidad
         no pudiendo reclamar a su desarrollador garantía alguna por problemas
         que puediese ocosionarle. APP desarrollada por Miguel Ponce Torres,
-        y bajo licencia GNU GPL
-    </string>
-    <string name="CopyRight"><![CDATA[Copyright (C) <2014> <Miguel Ponce Torres>]]></string>
+        y bajo licencia GNU GPL</string>
+    <string name="CopyRight"><![CDATA[Copyright © <2014> <Miguel Ponce Torres>]]></string>
     <string name="web_autor">www.pc-citos.es</string>
+    <string name="title_activity_ota__settings">OTA_Settings</string>
+    <string name="action_settings">Settings</string>
+    <string name="cbActivateOTA">Comprobar actualizaciones automáticas</string>
+    <string name="btCheckUpdatesNow">¡Buscar actualizaciones ahora!</string>
+    <string name="tvInfoOTA">Activando esta opción crearás un servicio de comprobación automático y
+        periódico de actualizaciones. Cuando una nueva actualización sea encontrada esta misma
+        aplicación se lo notificará, le mostrará los datos de la nueva actualización y pedirá su
+        confirmación para instalarse.</string>
 
 </resources>
