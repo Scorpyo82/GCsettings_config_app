@@ -14,12 +14,14 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/tvVersionActual"
             android:id="@+id/tvVersionActual"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:textColor="@color/tvColorOptions" />
+            android:textColor="@color/tvColorOptions"
+            android:textStyle="bold" />
 
         <TextView
             android:layout_width="fill_parent"
@@ -34,13 +36,15 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/tvUpdateDetect"
             android:id="@+id/tvUpdateOtaName"
             android:layout_below="@+id/tvMostrarVersion"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_marginTop="34dp"
-            android:textColor="@color/tvColorOptions" />
+            android:textColor="@color/tvColorOptions"
+            android:textStyle="bold" />
 
         <TextView
             android:layout_width="match_parent"
@@ -73,13 +77,15 @@
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/tvChanges"
             android:id="@+id/tvChanges"
             android:layout_below="@+id/tvMostrarUpdateOtaInfo"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_marginTop="26dp"
-            android:textColor="@color/tvColorOptions" />
+            android:textColor="@color/tvColorOptions"
+            android:textStyle="bold" />
 
         <TextView
             android:layout_width="fill_parent"
@@ -90,6 +96,8 @@
             android:layout_alignRight="@+id/tvChanges"
             android:layout_alignEnd="@+id/tvChanges"
             android:layout_above="@+id/btActualizar"
-            android:textColor="@color/tvColorOptions" />
+            android:textColor="@color/tvColorOptions"
+            android:layout_gravity="center|left" />
+
     </RelativeLayout>
 </FrameLayout>

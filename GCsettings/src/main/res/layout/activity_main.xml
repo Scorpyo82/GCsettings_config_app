@@ -12,6 +12,7 @@
     <CheckBox
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:textStyle="bold"
         android:text="@string/cbActivar_bootanimation"
         android:id="@+id/cbActivar_bootanimation"
         android:textColor="@color/cbColorText"
@@ -22,6 +23,7 @@
     <CheckBox
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:textStyle="bold"
         android:text="@string/cbActivar_shutdownanimation"
         android:id="@+id/cbActivar_shutdownanimation"
         android:textColor="@color/cbColorText"
@@ -33,6 +35,7 @@
     <CheckBox
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:textStyle="bold"
         android:text="@string/cbActivar_swap"
         android:id="@+id/cbActivar_swap"
         android:textColor="@color/cbColorText"
@@ -44,6 +47,7 @@
     <CheckBox
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:textStyle="bold"
         android:text="@string/cbUpdatesToSystem"
         android:id="@+id/cbUpdatesToSystem"
         android:textColor="@color/cbColorText"
@@ -55,6 +59,7 @@
     <CheckBox
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:textStyle="bold"
         android:text="@string/cbText2sd_ext"
         android:id="@+id/cbData2sd_ext"
         android:textColor="@color/cbColorText"

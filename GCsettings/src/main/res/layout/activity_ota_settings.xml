@@ -15,12 +15,15 @@
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textStyle="bold"
             android:text="@string/cbActivateOTA"
             android:id="@+id/cbActivateOta"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:checked="false"
+            android:enabled="false"
             android:textColor="@color/cbColorText" />
 
         <TextView

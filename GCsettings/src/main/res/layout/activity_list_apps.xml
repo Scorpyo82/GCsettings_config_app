@@ -15,6 +15,7 @@
         <CheckBox
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:textStyle="bold"
             android:text="@string/cbCom.android.vending"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
@@ -25,6 +26,7 @@
         <CheckBox
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:textStyle="bold"
             android:text="@string/cbCom.google.android.gms"
             android:id="@+id/cbCom.google.android.gms"
             android:textColor="@color/cbColorText"
@@ -35,6 +37,7 @@
         <CheckBox
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:textStyle="bold"
             android:text="@string/cbCom.buak.Link2SD"
             android:id="@+id/cbCom.buak.Link2SD"
             android:textColor="@color/cbColorText"
@@ -46,6 +49,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/cbDev.ukanth.ufirewall"
+            android:textStyle="bold"
             android:id="@+id/cbDev.ukanth.ufirewall"
             android:textColor="@color/cbColorText"
             android:layout_below="@+id/cbCom.buak.Link2SD"

@@ -92,7 +92,7 @@ public class OTA_Settings extends ActionBarActivity {
         // Ejecutamos un comando en modo root. Esto es lo que hace que nos aparezca
         // el superuser pidiendo confirmación.
         try {
-            String [] cmd = {"su","-c","/system/xbin/gc-ota","--upgrade"};
+            String [] cmd = {"su","-c","/system/xbin/gc-ota","--app"};
             Runtime.getRuntime().exec(cmd);
         } catch (IOException e) {
             e.printStackTrace();
