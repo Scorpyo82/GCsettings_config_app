@@ -35,7 +35,7 @@ public class MainActivity extends ActionBarActivity {
     public static String LINK2SD = "UPDATES2SYSTEM_APP_com.buak.Link2SD";
     public static String FIREWALL = "UPDATES2SYSTEM_APP_dev.ukanth.ufirewall";
 
-    //Opciones presentes en MainActivity
+    //Opciones presentes en OTA_Settings
     public static String AUTO_CHECK_OTA = "auto_check_ota";
 
 

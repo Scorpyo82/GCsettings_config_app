@@ -75,23 +75,8 @@ public class OtaInfo extends ActionBarActivity {
         {
             //Se muestra un mensaje avisando de que se debe realizar un reboot recovery
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Ya se ha completado la descarga de la actualización." +
-                    "Cuando esté listo puede reiniciar en modo recovery para que comienze la instalación." +
-                    "Recuerde, si reinicia de modo normal, se rechazará la acualización.")
-                    .setTitle("OTA ¡Todo listo!")
-                    .setCancelable(false)
-                    .setNeutralButton("Aceptar",
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    dialogInterface.cancel();
+            metodoInstalar();
 
-                                    finish();
-                                }
-                            });
-            AlertDialog alert = builder.create();
-            alert.show();
         }
 
 
@@ -122,7 +107,7 @@ public class OtaInfo extends ActionBarActivity {
 
             //Tras haber indicado todos los cambios a realizar (en este caso una configuración por defecto) le
             //indicamos al editor que los almacene en las preferencias.
-            editor.commit();
+            editor.apply();
 
             //Se muestra un mensaje avisando de que no hay rastro de que el binario "gc-ota" haya
             //dejado información en el archivo que sea de utilidad.
@@ -209,34 +194,112 @@ public class OtaInfo extends ActionBarActivity {
 
         //Se muestra un mensaje avisando de que se está descargando la actualización
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Querido usuario, a continuación se descargará la actualización." +
+        AlertDialog.Builder msgConfirmarDescarga = new AlertDialog.Builder(this);
+        msgConfirmarDescarga.setTitle("Listo para descarga...");
+        msgConfirmarDescarga.setMessage("Querido usuario, a continuación se descargará la actualización." +
                 "Por el momento no está implementada ninguna barra de progreso y se descargará en segundo plano." +
-                "Se le notificará con la finalización de la descarga.")
-                .setTitle("Listo para descarga...")
-                .setCancelable(false)
-                .setNeutralButton("Aceptar",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.cancel();
-                                //Se ejecuta el comando para actualizar
-                                try {
-                                    String [] cmd = {"su","-c","/system/xbin/gc-ota","--app","upgrade"};
-                                    Runtime.getRuntime().exec(cmd);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                                finish();
-                            }
-                        });
-        AlertDialog alert = builder.create();
-        alert.show();
+                "Se le notificará con la finalización de la descarga.\n\n ¿Descargar ahora?");
+
+        msgConfirmarDescarga.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+                //Se ejecuta el comando para actualizar
+                try {
+                    String [] cmd = {"su","-c","/system/xbin/gc-ota","--app","upgrade"};
+                    Runtime.getRuntime().exec(cmd);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                finish();
+
+            }});
+
+        msgConfirmarDescarga.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+                //Se muestra un mensaje y diciendo que no se hacen cambios.
+                Toast.makeText(getBaseContext(), "Sin cambios", Toast.LENGTH_SHORT).show();
+
+            }});
+        msgConfirmarDescarga.show();
+
     }
+
+
+
+    public void metodoInstalar(){
+
+
+        //Se muestra un mensaje avisando de que se está descargando la actualización
+
+        AlertDialog.Builder msgInstalarUpdate = new AlertDialog.Builder(this);
+        msgInstalarUpdate.setCancelable(false);
+        msgInstalarUpdate.setTitle("OTA Descarga terminada");
+        msgInstalarUpdate.setMessage("Ya se ha compleado la descarga de la actualización.\n\n" +
+                "Puede reiniciar e instalar la actualización ahora o más tarde reiniciando " +
+                "en modo recovery. Si reinicia en modo normal se anulará la instalación.\n\n" +
+                "¿Quiere ustéd reiniciar e instalarlo ahora?");
+
+
+        msgInstalarUpdate.setPositiveButton("Reiniciar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+                //Se ejecuta el comando para actualizar
+                try {
+                    String[] cmd = {"su","-c","reboot","recovery"};
+                    Runtime.getRuntime().exec(cmd);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                finish();
+
+            }
+        });
+
+        msgInstalarUpdate.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+                //Se muestra un mensaje y diciendo que no se hacen cambios.
+                Toast.makeText(getBaseContext(), "Recuerde reiniciar en modo recovery", Toast.LENGTH_LONG).show();
+
+            }});
+        msgInstalarUpdate.show();
+
+    }
+
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+
+        //Se llama a este método para recargar las variables
+        MetodoReloadPreferences();
+    }
+
+    private void MetodoReloadPreferences(){
+
+        //Obtiene el objeto de ajustes de la aplicación llamado OtaInfo.
+        SharedPreferences sharedPreferences = OtaInfo.this.getSharedPreferences("OtaInfo", 0);
+
+        //Obtenemos todos los valores:
+        boolean preparado = sharedPreferences.getBoolean(PREPARADO, false);
+        boolean fallo = sharedPreferences.getBoolean(FALLO, false);
+        String motivo_fallo = sharedPreferences.getString(MOTIVO_FALLO, "Fallo desconocido");
+        boolean reiniciar = sharedPreferences.getBoolean(REINICIAR, false);
+        String vesion_rom_actual = sharedPreferences.getString(VERSION_ROM_ACTUAL,"Sin datos");
+        String updae_ota = sharedPreferences.getString(UPDATE_OTA, "Sin datos");
+        String ota_changes = sharedPreferences.getString(OTA_CHANGES,"Sin datos");
+
 
     }
 
