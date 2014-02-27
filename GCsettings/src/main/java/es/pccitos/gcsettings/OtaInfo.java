@@ -23,7 +23,8 @@ public class OtaInfo extends ActionBarActivity {
     public static String VERSION_ROM_ACTUAL = "version_rom_actual";
     public static String UPDATE_OTA = "update_ota";
     public static String OTA_CHANGES = "ota_changes";
-    //public static String UPDATE_PACKAGE = "update_package";
+    public static String UPDATE_PACKAGE = "update_package";
+
 
 
     @Override
@@ -31,12 +32,14 @@ public class OtaInfo extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ota_info);
 
+        //Obtiene el objeto de ajustes de la aplicación llamado OtaInfo.
+        SharedPreferences sharedPreferences = OtaInfo.this.getSharedPreferences("OtaInfo", 0);
+
         //Declaración de los botones
         final Button btActualizar = (Button) findViewById(R.id.btActualizar);
         Button btDescartar = (Button) findViewById(R.id.btSalir);
 
-        //Obtiene el objeto de ajustes de la aplicación llamado OtaInfo.
-        SharedPreferences sharedPreferences = OtaInfo.this.getSharedPreferences("OtaInfo", 0);
+
 
         //Obtenemos el booleano almacenado en las preferencias de nombre "fallo"
         //Si existe y es verdadero significa que ha habido un problema
@@ -131,12 +134,6 @@ public class OtaInfo extends ActionBarActivity {
 
         }
 
-        else {
-
-            Toast.makeText(getBaseContext(), "¡Update encontrado!", Toast.LENGTH_SHORT).show();
-
-        }
-
 
         //Cargar configuración para los textwiew
         //Obtiene un booleano almacenado en las preferencias para cada clave
@@ -213,6 +210,15 @@ public class OtaInfo extends ActionBarActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
+                //Obtiene el objeto de ajustes de la aplicación llamado OtaInfo.
+                SharedPreferences sharedPreferences = OtaInfo.this.getSharedPreferences("OtaInfo", 0);
+
+                //Se muestra un mensaje y diciendo el paquete que se está descargando y se sale de la app
+
+                String VG_UPDATE_PACKAGE = sharedPreferences.getString(UPDATE_PACKAGE,"Sin datos");
+
+                Toast.makeText(getBaseContext(), "Descargando " + VG_UPDATE_PACKAGE, Toast.LENGTH_SHORT).show();
                 finish();
 
             }});
