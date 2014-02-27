@@ -32,7 +32,6 @@ public class OtaInfo extends ActionBarActivity {
         setContentView(R.layout.activity_ota_info);
 
         //Declaración de los botones
-
         final Button btActualizar = (Button) findViewById(R.id.btActualizar);
         Button btDescartar = (Button) findViewById(R.id.btSalir);
 
@@ -50,7 +49,7 @@ public class OtaInfo extends ActionBarActivity {
             //Se muestra un mensaje avisando del fallo y el motivo
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Se vé que ha habido un problema. El motivo es el siguiente:\n" + motivo_fallo)
+            builder.setMessage("Se vé que ha habido un problema. El motivo es el siguiente:\n\n" + motivo_fallo)
                     .setTitle("OTA ¡UPS!")
                     .setCancelable(false)
                     .setNeutralButton("Aceptar",
@@ -113,7 +112,7 @@ public class OtaInfo extends ActionBarActivity {
             //dejado información en el archivo que sea de utilidad.
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("La busqueda de la actualización fué infructuosa por falta de datos." +
+            builder.setMessage("La busqueda de la actualización fue infructuosa por falta de datos.\n\n" +
                     "NO SE PERMITIRÁ LA ACTUALIZACIÓN")
                     .setTitle("Hubo un problema...")
                     .setCancelable(false)
@@ -130,14 +129,17 @@ public class OtaInfo extends ActionBarActivity {
             AlertDialog alert = builder.create();
             alert.show();
 
+        }
+
+        else {
+
+            Toast.makeText(getBaseContext(), "¡Update encontrado!", Toast.LENGTH_SHORT).show();
 
         }
 
 
-
-
-        //Cargar configuración para los CheckBox
-        //Obtiene un booleano almacenado en las preferencias para cada
+        //Cargar configuración para los textwiew
+        //Obtiene un booleano almacenado en las preferencias para cada clave
         //El segundo parametro indica el valor a devolver si no lo encuentra, en este caso, falso.
 
         //El prefijo VG_ es para identificar el Valor Guardado inicialmente
@@ -196,7 +198,7 @@ public class OtaInfo extends ActionBarActivity {
 
         AlertDialog.Builder msgConfirmarDescarga = new AlertDialog.Builder(this);
         msgConfirmarDescarga.setTitle("Listo para descarga...");
-        msgConfirmarDescarga.setMessage("Querido usuario, a continuación se descargará la actualización." +
+        msgConfirmarDescarga.setMessage("Querido usuario, a continuación se descargará la actualización. " +
                 "Por el momento no está implementada ninguna barra de progreso y se descargará en segundo plano." +
                 "Se le notificará con la finalización de la descarga.\n\n ¿Descargar ahora?");
 
@@ -240,7 +242,7 @@ public class OtaInfo extends ActionBarActivity {
         msgInstalarUpdate.setMessage("Ya se ha compleado la descarga de la actualización.\n\n" +
                 "Puede reiniciar e instalar la actualización ahora o más tarde reiniciando " +
                 "en modo recovery. Si reinicia en modo normal se anulará la instalación.\n\n" +
-                "¿Quiere ustéd reiniciar e instalarlo ahora?");
+                "¿Quiere usted reiniciar e instalarlo ahora?");
 
 
         msgInstalarUpdate.setPositiveButton("Reiniciar", new DialogInterface.OnClickListener() {
@@ -278,6 +280,7 @@ public class OtaInfo extends ActionBarActivity {
 
     }
 
+    /*
     @Override
     protected void onResume(){
         super.onResume();
@@ -286,7 +289,8 @@ public class OtaInfo extends ActionBarActivity {
         MetodoReloadPreferences();
     }
 
-    private void MetodoReloadPreferences(){
+
+    public void MetodoReloadPreferences(){
 
         //Obtiene el objeto de ajustes de la aplicación llamado OtaInfo.
         SharedPreferences sharedPreferences = OtaInfo.this.getSharedPreferences("OtaInfo", 0);
@@ -302,5 +306,7 @@ public class OtaInfo extends ActionBarActivity {
 
 
     }
+    */
+
 
 }
