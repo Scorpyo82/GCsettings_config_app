@@ -26,33 +26,39 @@ public class OtaInfo extends ActionBarActivity {
     public static String UPDATE_PACKAGE = "update_package";
 
 
+    public boolean fallo;
+    public String motivo_fallo;
+    public boolean reiniciar;
+    public boolean preparado;
+    public String version_rom_actual;
+    public String update_ota;
+    public String ota_changes;
+    public String update_package;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ota_info);
 
+        //Declaración de los botones
+        Button btActualizar = (Button) findViewById(R.id.btActualizar);
+        Button btDescartar = (Button) findViewById(R.id.btSalir);
+
         //Obtiene el objeto de ajustes de la aplicación llamado OtaInfo.
         SharedPreferences sharedPreferences = OtaInfo.this.getSharedPreferences("OtaInfo", 0);
 
-        //Declaración de los botones
-        final Button btActualizar = (Button) findViewById(R.id.btActualizar);
-        Button btDescartar = (Button) findViewById(R.id.btSalir);
+        //Creamos el editor
+        SharedPreferences.Editor editor = sharedPreferences.edit();
 
-
-
-        //Obtenemos el booleano almacenado en las preferencias de nombre "fallo"
-        //Si existe y es verdadero significa que ha habido un problema
-        boolean fallo = sharedPreferences.getBoolean(FALLO,false);
-        String motivo_fallo = sharedPreferences.getString(MOTIVO_FALLO,"Fallo desconocido");
-
+        metodoReloadPreferences();
 
         if(fallo)
         {
             //Se muestra un mensaje avisando del fallo y el motivo
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Se vé que ha habido un problema. El motivo es el siguiente:\n\n" + motivo_fallo)
+            builder.setMessage("Ha habido un problema. El motivo es el siguiente:\n\n" + motivo_fallo)
                     .setTitle("OTA ¡UPS!")
                     .setCancelable(false)
                     .setNeutralButton("Aceptar",
@@ -61,17 +67,12 @@ public class OtaInfo extends ActionBarActivity {
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     dialogInterface.cancel();
 
-                                    finish();
-                                }
+                                    System.exit(0);                                 }
                             });
             AlertDialog alert = builder.create();
             alert.show();
         }
 
-
-        //Obtenemos el booleano almacenado en las preferencias de nombre "reiniciar"
-        //Si existe y es verdadero significa que la descarga terminó y hay que reiniciar en modo recovery
-        boolean reiniciar = sharedPreferences.getBoolean(REINICIAR,false);
 
         if(reiniciar)
         {
@@ -82,19 +83,13 @@ public class OtaInfo extends ActionBarActivity {
         }
 
 
-        //Obtenemos el booleano almacenado en las preferencias de nombre "preparado".
-        //El segundo parametro indica el valor a devolver si no lo encuentra, en este caso, falso.
-        boolean preparado = sharedPreferences.getBoolean(PREPARADO,false);
-
         if(!preparado)
         {
 
-            //Preparamos el editor para ShareprePreferences
-            SharedPreferences.Editor editor = sharedPreferences.edit();
 
-            //Le indicamos que queremos que almacene un booleano de nombre inicializado con valor true
+            //Le indicamos que queremos que almacene un booleano de nombre "preparado" con valor true
             //Además, introducimos el resto de valores para los textview por defecto, en este caso ajustados
-            //la CustomRom GingerCerecilla v0.8
+            //para la CustomRom GingerCerecilla v0.8
 
             editor.putBoolean(FALLO, false);
             editor.putBoolean(REINICIAR, false);
@@ -135,29 +130,6 @@ public class OtaInfo extends ActionBarActivity {
         }
 
 
-        //Cargar configuración para los textwiew
-        //Obtiene un booleano almacenado en las preferencias para cada clave
-        //El segundo parametro indica el valor a devolver si no lo encuentra, en este caso, falso.
-
-        //El prefijo VG_ es para identificar el Valor Guardado inicialmente
-        final String VG_VERSION_ROM_ACTUAL = sharedPreferences.getString(VERSION_ROM_ACTUAL,"Sin datos");
-        final String VG_UPDATE_OTA = sharedPreferences.getString(UPDATE_OTA, "Sin datos");
-        final String VG_OTA_CHANGES = sharedPreferences.getString(OTA_CHANGES,"Sin datos");
-
-
-
-        //Declaración de los textview
-        TextView tvMostrarVersion = (TextView) findViewById(R.id.tvMostrarVersion);
-        TextView tvMostrarUpdateOtaInfo = (TextView) findViewById(R.id.tvMostrarUpdateOtaInfo);
-        TextView tvMostrarCambios = (TextView) findViewById(R.id.tvMostrarCambios);
-
-
-        //Se le aplica el valor string correspondiente a cada clave leida a cada textview
-        tvMostrarVersion.setText(VG_VERSION_ROM_ACTUAL);
-        tvMostrarUpdateOtaInfo.setText(VG_UPDATE_OTA);
-        tvMostrarCambios.setText(VG_OTA_CHANGES);
-
-
         //Eventos de los botones Aplicar y salir
 
         btActualizar.setOnClickListener(new View.OnClickListener() {
@@ -175,8 +147,8 @@ public class OtaInfo extends ActionBarActivity {
 
                 Toast.makeText(getBaseContext(), "Cerrando sin cambios", Toast.LENGTH_SHORT).show();
 
-                finish();
-
+                //android.os.Process.killProcess(android.os.Process.myPid());
+                System.exit(0);
             }
         });
 
@@ -211,16 +183,9 @@ public class OtaInfo extends ActionBarActivity {
                     e.printStackTrace();
                 }
 
-                //Obtiene el objeto de ajustes de la aplicación llamado OtaInfo.
-                SharedPreferences sharedPreferences = OtaInfo.this.getSharedPreferences("OtaInfo", 0);
-
                 //Se muestra un mensaje y diciendo el paquete que se está descargando y se sale de la app
-
-                String VG_UPDATE_PACKAGE = sharedPreferences.getString(UPDATE_PACKAGE,"Sin datos");
-
-                Toast.makeText(getBaseContext(), "Descargando " + VG_UPDATE_PACKAGE, Toast.LENGTH_SHORT).show();
-                finish();
-
+                Toast.makeText(getBaseContext(), "Descargando " + update_package, Toast.LENGTH_SHORT).show();
+                System.exit(0);
             }});
 
         msgConfirmarDescarga.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -262,8 +227,7 @@ public class OtaInfo extends ActionBarActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                finish();
-
+                System.exit(0);
             }
         });
 
@@ -286,33 +250,75 @@ public class OtaInfo extends ActionBarActivity {
 
     }
 
-    /*
+
     @Override
     protected void onResume(){
         super.onResume();
 
         //Se llama a este método para recargar las variables
-        MetodoReloadPreferences();
+        metodoReloadPreferences();
     }
 
-
-    public void MetodoReloadPreferences(){
+    public void metodoReloadPreferences(){
 
         //Obtiene el objeto de ajustes de la aplicación llamado OtaInfo.
         SharedPreferences sharedPreferences = OtaInfo.this.getSharedPreferences("OtaInfo", 0);
 
-        //Obtenemos todos los valores:
-        boolean preparado = sharedPreferences.getBoolean(PREPARADO, false);
-        boolean fallo = sharedPreferences.getBoolean(FALLO, false);
-        String motivo_fallo = sharedPreferences.getString(MOTIVO_FALLO, "Fallo desconocido");
-        boolean reiniciar = sharedPreferences.getBoolean(REINICIAR, false);
-        String vesion_rom_actual = sharedPreferences.getString(VERSION_ROM_ACTUAL,"Sin datos");
-        String updae_ota = sharedPreferences.getString(UPDATE_OTA, "Sin datos");
-        String ota_changes = sharedPreferences.getString(OTA_CHANGES,"Sin datos");
+        //Recargamos las variables con sus respectivos valores:
 
+        preparado = sharedPreferences.getBoolean(PREPARADO, false);
+
+        //Obtenemos el booleano almacenado en las preferencias de nombre "fallo"
+        //Si existe y es verdadero significa que ha habido un problema
+        fallo = sharedPreferences.getBoolean(FALLO, false);
+        motivo_fallo = sharedPreferences.getString(MOTIVO_FALLO, "Fallo desconocido");
+
+        //Obtenemos el booleano almacenado en las preferencias de nombre "reiniciar"
+        //Si existe y es verdadero significa que la descarga terminó y hay que reiniciar en modo recovery
+        reiniciar = sharedPreferences.getBoolean(REINICIAR, false);
+
+        version_rom_actual = sharedPreferences.getString(VERSION_ROM_ACTUAL,"Sin datos");
+        update_ota = sharedPreferences.getString(UPDATE_OTA, "Sin datos");
+        ota_changes = sharedPreferences.getString(OTA_CHANGES,"Sin datos");
+        update_package = sharedPreferences.getString(UPDATE_PACKAGE,"Sin datos");
+
+
+        //Cargar configuración para los textwiew
+        //Obtiene un booleano almacenado en las preferencias para cada clave
+        //El segundo parametro indica el valor a devolver si no lo encuentra, en este caso, falso.
+
+        //El prefijo VG_ es para identificar el Valor Guardado inicialmente
+        final String VG_VERSION_ROM_ACTUAL = sharedPreferences.getString(VERSION_ROM_ACTUAL,"Sin datos");
+        final String VG_UPDATE_OTA = sharedPreferences.getString(UPDATE_OTA, "Sin datos");
+        final String VG_OTA_CHANGES = sharedPreferences.getString(OTA_CHANGES,"Sin datos");
+
+        //Declaración de los textview
+        TextView tvMostrarVersion = (TextView) findViewById(R.id.tvMostrarVersion);
+        TextView tvMostrarUpdateOtaInfo = (TextView) findViewById(R.id.tvMostrarUpdateOtaInfo);
+        TextView tvMostrarCambios = (TextView) findViewById(R.id.tvMostrarCambios);
+
+        //Se le aplica el valor string correspondiente a cada clave leida a cada textview
+        tvMostrarVersion.setText(VG_VERSION_ROM_ACTUAL);
+        tvMostrarUpdateOtaInfo.setText(VG_UPDATE_OTA);
+        tvMostrarCambios.setText(VG_OTA_CHANGES);
+
+        /*
+        //Creamos el editor
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putBoolean(FALLO, fallo);
+        editor.putString(MOTIVO_FALLO, motivo_fallo);
+        editor.putBoolean(REINICIAR, reiniciar);
+        editor.putBoolean(PREPARADO, preparado);
+        editor.putString(VERSION_ROM_ACTUAL, version_rom_actual);
+        editor.putString(UPDATE_OTA, update_ota);
+        editor.putString(OTA_CHANGES,ota_changes);
+        editor.putString(UPDATE_PACKAGE, update_package);
+
+        editor.apply();
+        */
 
     }
-    */
 
 
 }
