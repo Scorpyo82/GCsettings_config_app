@@ -45,32 +45,14 @@ public class OtaInfo extends ActionBarActivity {
         Button btActualizar = (Button) findViewById(R.id.btActualizar);
         Button btDescartar = (Button) findViewById(R.id.btSalir);
 
-        //Obtiene el objeto de ajustes de la aplicación llamado OtaInfo.
-        SharedPreferences sharedPreferences = OtaInfo.this.getSharedPreferences("OtaInfo", 0);
 
-        //Creamos el editor
-        SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        metodoReloadPreferences();
-
+        metodoLoadPreferences();
         if(fallo)
         {
-            //Se muestra un mensaje avisando del fallo y el motivo
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Ha habido un problema. El motivo es el siguiente:\n\n" + motivo_fallo)
-                    .setTitle("OTA ¡UPS!")
-                    .setCancelable(false)
-                    .setNeutralButton("Aceptar",
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    dialogInterface.cancel();
+            metodoFallo();
 
-                                    System.exit(0);                                 }
-                            });
-            AlertDialog alert = builder.create();
-            alert.show();
         }
 
 
@@ -86,46 +68,7 @@ public class OtaInfo extends ActionBarActivity {
         if(!preparado)
         {
 
-
-            //Le indicamos que queremos que almacene un booleano de nombre "preparado" con valor true
-            //Además, introducimos el resto de valores para los textview por defecto, en este caso ajustados
-            //para la CustomRom GingerCerecilla v0.8
-
-            editor.putBoolean(FALLO, false);
-            editor.putBoolean(REINICIAR, false);
-            editor.putBoolean(PREPARADO, false);
-            editor.putString(VERSION_ROM_ACTUAL, "No es posible determinar...");
-            editor.putString(UPDATE_OTA, "No se han encontrado datos...");
-            editor.putString(OTA_CHANGES,"No se han encontrado datos...");
-
-            //Además, desactivamos el botón de actualizar para que no se pueda continuar.
-            btActualizar.setEnabled(false);
-
-
-            //Tras haber indicado todos los cambios a realizar (en este caso una configuración por defecto) le
-            //indicamos al editor que los almacene en las preferencias.
-            editor.apply();
-
-            //Se muestra un mensaje avisando de que no hay rastro de que el binario "gc-ota" haya
-            //dejado información en el archivo que sea de utilidad.
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("La busqueda de la actualización fue infructuosa por falta de datos.\n\n" +
-                    "NO SE PERMITIRÁ LA ACTUALIZACIÓN")
-                    .setTitle("Hubo un problema...")
-                    .setCancelable(false)
-                    .setNeutralButton("Continuar",
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    dialogInterface.cancel();
-
-                                    Toast.makeText(getBaseContext(), "¡Botón desactivado!", Toast.LENGTH_SHORT).show();
-
-                                }
-                            });
-            AlertDialog alert = builder.create();
-            alert.show();
+            metodoSinDatos();
 
         }
 
@@ -147,8 +90,10 @@ public class OtaInfo extends ActionBarActivity {
 
                 Toast.makeText(getBaseContext(), "Cerrando sin cambios", Toast.LENGTH_SHORT).show();
 
-                //android.os.Process.killProcess(android.os.Process.myPid());
-                System.exit(0);
+                finish();
+                //SystemClock.sleep(8000);
+                //System.exit(0);
+
             }
         });
 
@@ -185,7 +130,9 @@ public class OtaInfo extends ActionBarActivity {
 
                 //Se muestra un mensaje y diciendo el paquete que se está descargando y se sale de la app
                 Toast.makeText(getBaseContext(), "Descargando " + update_package, Toast.LENGTH_SHORT).show();
-                System.exit(0);
+
+                finish();
+                //android.os.Process.killProcess(android.os.Process.myPid());
             }});
 
         msgConfirmarDescarga.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -227,7 +174,9 @@ public class OtaInfo extends ActionBarActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                System.exit(0);
+
+                finish();
+
             }
         });
 
@@ -250,16 +199,34 @@ public class OtaInfo extends ActionBarActivity {
 
     }
 
+    /*
+    public void reload() {
+
+        if (Build.VERSION.SDK_INT >= 11) {
+            recreate();
+        } else {
+            Intent intent = getIntent();
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            finish();
+            overridePendingTransition(0, 0);
+
+            startActivity(intent);
+            overridePendingTransition(0, 0);
+        }
+    }
+    */
 
     @Override
     protected void onResume(){
         super.onResume();
-
         //Se llama a este método para recargar las variables
-        metodoReloadPreferences();
+        metodoLoadPreferences();
+
     }
 
-    public void metodoReloadPreferences(){
+
+
+    public void metodoLoadPreferences(){
 
         //Obtiene el objeto de ajustes de la aplicación llamado OtaInfo.
         SharedPreferences sharedPreferences = OtaInfo.this.getSharedPreferences("OtaInfo", 0);
@@ -282,25 +249,15 @@ public class OtaInfo extends ActionBarActivity {
         ota_changes = sharedPreferences.getString(OTA_CHANGES,"Sin datos");
         update_package = sharedPreferences.getString(UPDATE_PACKAGE,"Sin datos");
 
-
-        //Cargar configuración para los textwiew
-        //Obtiene un booleano almacenado en las preferencias para cada clave
-        //El segundo parametro indica el valor a devolver si no lo encuentra, en este caso, falso.
-
-        //El prefijo VG_ es para identificar el Valor Guardado inicialmente
-        final String VG_VERSION_ROM_ACTUAL = sharedPreferences.getString(VERSION_ROM_ACTUAL,"Sin datos");
-        final String VG_UPDATE_OTA = sharedPreferences.getString(UPDATE_OTA, "Sin datos");
-        final String VG_OTA_CHANGES = sharedPreferences.getString(OTA_CHANGES,"Sin datos");
-
         //Declaración de los textview
         TextView tvMostrarVersion = (TextView) findViewById(R.id.tvMostrarVersion);
         TextView tvMostrarUpdateOtaInfo = (TextView) findViewById(R.id.tvMostrarUpdateOtaInfo);
         TextView tvMostrarCambios = (TextView) findViewById(R.id.tvMostrarCambios);
 
         //Se le aplica el valor string correspondiente a cada clave leida a cada textview
-        tvMostrarVersion.setText(VG_VERSION_ROM_ACTUAL);
-        tvMostrarUpdateOtaInfo.setText(VG_UPDATE_OTA);
-        tvMostrarCambios.setText(VG_OTA_CHANGES);
+        tvMostrarVersion.setText(version_rom_actual);
+        tvMostrarUpdateOtaInfo.setText(update_ota);
+        tvMostrarCambios.setText(ota_changes);
 
         /*
         //Creamos el editor
@@ -320,5 +277,84 @@ public class OtaInfo extends ActionBarActivity {
 
     }
 
+    public void metodoSinDatos(){
 
-}
+        //Declaración de los botones
+        Button btActualizar = (Button) findViewById(R.id.btActualizar);
+        //Button btDescartar = (Button) findViewById(R.id.btSalir);
+
+        /*
+        //Obtiene el objeto de ajustes de la aplicación llamado OtaInfo.
+        SharedPreferences sharedPreferences = OtaInfo.this.getSharedPreferences("OtaInfo", 0);
+
+        //Creamos el editor
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        //Le indicamos que queremos que almacene un booleano de nombre "preparado" con valor true
+        //Además, introducimos el resto de valores para los textview por defecto, en este caso ajustados
+        //para la CustomRom GingerCerecilla v0.8
+
+        editor.putBoolean(FALLO, false);
+        editor.putBoolean(REINICIAR, false);
+        editor.putBoolean(PREPARADO, false);
+        editor.putString(VERSION_ROM_ACTUAL, "No es posible determinar...");
+        editor.putString(UPDATE_OTA, "No se han encontrado datos...");
+        editor.putString(OTA_CHANGES,"No se han encontrado datos...");
+
+
+        //Tras haber indicado todos los cambios a realizar (en este caso una configuración por defecto) le
+        //indicamos al editor que los almacene en las preferencias.
+        editor.apply();
+        */
+
+        //Además, desactivamos el botón de actualizar para que no se pueda continuar.
+        btActualizar.setEnabled(false);
+
+        //Se muestra un mensaje avisando de que no hay rastro de que el binario "gc-ota" haya
+        //dejado información en el archivo que sea de utilidad.
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("La busqueda de la actualización fue infructuosa por falta de datos.\n\n" +
+                "NO SE PERMITIRÁ LA ACTUALIZACIÓN")
+                .setTitle("Hubo un problema...")
+                .setCancelable(false)
+                .setNeutralButton("Continuar",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.cancel();
+
+                                Toast.makeText(getBaseContext(), "¡Botón desactivado!", Toast.LENGTH_SHORT).show();
+
+                            }
+                        });
+        AlertDialog alert = builder.create();
+        alert.show();
+
+    }
+
+    public void metodoFallo(){
+
+        //Se muestra un mensaje avisando del fallo y el motivo
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Ha habido un problema. El motivo es el siguiente:\n\n" + motivo_fallo)
+                .setTitle("OTA ¡UPS!")
+                .setCancelable(false)
+                .setNeutralButton("Aceptar",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.cancel();
+
+                                finish();
+                            }
+                        });
+        AlertDialog alert = builder.create();
+        alert.show();
+
+    }
+
+
+
+    }
