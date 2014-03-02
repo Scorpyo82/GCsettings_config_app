@@ -338,7 +338,7 @@ public class OtaInfo extends ActionBarActivity {
         //Se muestra un mensaje avisando del fallo y el motivo
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Ha habido un problema. El motivo es el siguiente:\n\n" + motivo_fallo)
+        builder.setMessage("Ha habido un inconveniente. El motivo es el siguiente:\n\n" + motivo_fallo)
                 .setTitle("OTA ¡UPS!")
                 .setCancelable(false)
                 .setNeutralButton("Aceptar",

@@ -533,10 +533,22 @@ function LIST_APPS_GCSETTINGS(){
 function KILL_APK(){
 ## Función que cierra la aplicación antes de eliminar sus archivos
 	echo ""
-	echo "Cerrando la aplicación $i antes de continuar..."
+	echo "Buscando si la aplicación $i está en ejecución..."
 	echo "..."
-	kill `ps | grep $i | awk '{print $2}'`
-	echo "Aplicación $i cerrada!"
+	ps | grep $i
+	if [ $? == "0" ]
+	then
+		echo "La aplicación está corriendo y se va a cerrar..."
+		kill $(ps | grep $i | awk '{print $2}')
+		if [ $? == "0" ]
+		then
+			echo "¡Aplicación $i cerrada con éxito!"
+		else
+			echo "La apliación no se pudo cerrar adecuadamente"
+		fi
+	else
+		echo "La aplicación no está ejecutándose."
+	fi
 }
 
 function BUSCAR_APP(){
@@ -550,7 +562,7 @@ function BUSCAR_APP(){
 	echo "" 
 	echo "Buscando actualizaciones de $i en /data/app " 
 	# Obtenemos la ruta real donde se encuentra el archivo suponiendo que no sea un enlace simbólico (si es que existe)
-	PATH_APP_UPDATE=$(busybox find /data/app/ -name "$i??.apk" -exec ls -al {} \; | awk '{ print $9}')
+	PATH_APP_UPDATE=$(busybox find /data/app/ -name "$i*.apk" -exec ls -al {} \; | awk '{ print $9}')
 	# Si no se obtubo ruta, se busca el archivo suponiendo que sea un enlace simbólico
 	# y generamos dos variables para guardar las rutas del archivo original y el enlace simbólico
 	if [ "$PATH_APP_UPDATE" == "" ]
@@ -559,10 +571,10 @@ function BUSCAR_APP(){
 		echo "No hay actualizaciones en /data/app" 
 		echo "Buscando ahora en /data/sdext2 por si fué movido por Link2SD o similar..." 
 		# Se guarda la ruta real donde se encuentra el archivo al que apunta el enlace simbólico encontrado
-		PATH_APP_UPDATE=$(busybox find /data/app/ -name "$i??.apk" -type l -exec ls -al {} \; | grep "data/sdext2/" | awk '{ print $11}')
+		PATH_APP_UPDATE=$(busybox find /data/app/ -name "$i*.apk" -type l -exec ls -al {} \; | grep "data/sdext2/" | awk '{ print $11}')
 
 		# Se guarda la ruta donde se encuentra el enlace simbólico que apunta el archivo encontrado
-		LINK_APP_UPDATE=$(busybox find /data/app/ -name "$i??.apk" -type l -exec ls -al {} \; | grep "data/sdext2/" | awk '{ print $9}')
+		LINK_APP_UPDATE=$(busybox find /data/app/ -name "$i*.apk" -type l -exec ls -al {} \; | grep "data/sdext2/" | awk '{ print $9}')
 	fi
 
 	## Comprobamos si al fin se obtuvo una ruta válida
@@ -576,6 +588,8 @@ function MOVER_APP(){
 
 	CALCULAR_ESPACIO_PARA_APP
 
+	echo ""
+
 	if [ $SIZE_DELETE_ORIGINAL -gt $SIZE_APP_UPDATE ]
 	then
 		
@@ -586,8 +600,9 @@ function MOVER_APP(){
 		KILL_APK ## Se llama a esta función para cerrar la app antes de que se hagan operaciones
 
 		# Eliminando elnaces simbólicos de /data/app
+		echo ""
 		echo "Eliminando enlaces simbólicos si existen..." 
-		busybox rm -f $(find /data/app/ -name "$i??.apk" -type l -exec ls -al {} \; | grep "data/sdext2/" | awk '{ print $9}')
+		busybox rm -f $(find /data/app/ -name "$i*.apk" -type l -exec ls -al {} \; | grep "data/sdext2/" | awk '{ print $9}')
 
 		# Eliminando archivo original
 		echo "Eliminando archivo original..." 
@@ -621,7 +636,7 @@ function BUSCAR_DEX_DALVIK(){
 	# Obtenemos la ruta real donde se encuentra el archivo dex de la aplicación suponiendo que sea un enlace simbólico (si es que existe)
 	echo "" 
 	echo "Buscando si existe archivo dex enlazado por Link2SD de $i en data/sdext2/dalvik-cache/ " 
-	PATH_DALVIK_APP_UPDATE=$(busybox find /data/dalvik-cache/ -name "*@app@$i??.apk@classes.dex" -type l -exec ls -al {} \; | grep "data/sdext2/dalvik-cache/" | awk '{ print $11}')
+	PATH_DEX_DALVIK_APP_UPDATE=$(busybox find /data/dalvik-cache/ -name "data@app@$i*.apk@classes.dex" -type l -exec ls -al {} \; | grep "data/sdext2/dalvik-cache/" | awk '{ print $11}')
 
 	# Si no se obtuvo una ruta, se probará a buscar enlaces no simbólicos
 	if [ "$PATH_DEX_DALVIK_APP_UPDATE" != "" ]
@@ -635,19 +650,23 @@ function BUSCAR_DEX_DALVIK(){
 		echo "No hay hay enlaces de Link2SD a archivos dex de la aplicación en /data/dalvik-cache/" 
 		echo "Buscando ahora dex normales en /data/dalvik-cache" 
 		# Obtenemos la ruta real donde se encuentra el archivo suponiendo que no sea un enlace simbólico (si es que existe)
-		PATH_DALVIK_APP_UPDATE=$(busybox find /data/dalvik-cache/ -name "*@app@$i??.apk@classes.dex" -exec ls -al {} \; | awk '{ print $9}')
+		PATH_DEX_DALVIK_APP_UPDATE=$(busybox find /data/dalvik-cache/ -name "data@app@$i*.apk@classes.dex" -exec ls -al {} \; | awk '{ print $9}')
 
 	fi
 
 	## Comprobamos si al fin se obtuvo una ruta válida
 	if [ "$PATH_DEX_DALVIK_APP_UPDATE" == "" ]
 	then
-		echo "No se pudo encontrar ningúna ruta hasta el archivo $i.apk" 
+		echo "No se pudo encontrar ningúna archivo dex para la aplicación $i.apk" 
+	else
+		echo "Se pudo encontrar un archivo dex para la aplicación $i.apk" 
 	fi
 }
 
 
 function MOVER_DEX_DALVIK_APP(){
+
+	echo ""
 
 	## Si el archivo era un enlace simbólico entonces hay que calcular si cabería en /data
 	if [ "$DALVIK_LINK" == true ]
@@ -655,7 +674,7 @@ function MOVER_DEX_DALVIK_APP(){
 
 		CALCULAR_ESPACIO_PARA_DEX
 
-		if [ $ESPACIOSYSTEM -gt $SIZE_PATH_DALVIK_APP_UPDATE ]
+		if [ $ESPACIOSYSTEM -gt $SIZE_PATH_DEX_DALVIK_APP_UPDATE ]
 		then
 		
 			echo "Hay espacio para mover la actualización a system..." 
@@ -665,17 +684,17 @@ function MOVER_DEX_DALVIK_APP(){
 			# Obtenemos el nombre actual del archivo en /data/dalvik y la
 			# metemos en una variable que modificamos para que pertenezca a system
 			
-			PATH_DEX_OLD=$(ls /data/dalvik-cache/data@app@$i??.apk@classes.dex)
+			PATH_DEX_OLD=$(ls /data/dalvik-cache/data@app@$i*.apk@classes.dex)
 			#PATH_DEX_FIX=$(echo $PATH_DEX_OLD | sed 's,/data@app@,/system@app@,g')
-			PATH_DEX_FIX="system@app@$i.apk@classes.dex"
+			PATH_DEX_FIX="/data/dalvik-cache/system@app@$i.apk@classes.dex"
 
 			# Eliminando elnaces simbólicos de /data/app
 			echo "Eliminando enlaces simbólicos..." 
-			busybox rm -f $(find /data/dalvik-cache/ -name "data@app@$i??.apk@classes.dex" -type l -exec ls -al {} \; | grep "data/sdext2/" | awk '{ print $9}')
+			busybox rm -f $(find /data/dalvik-cache/ -name "data@app@$i*.apk@classes.dex" -type l -exec ls -al {} \; | grep "data/sdext2/" | awk '{ print $9}')
 	
 			# Copiando carpeta de /data/sdext2/ a data/ y conservando atributos
 			echo "Compiando DEX a /data/dalvik/ conservando atributos..." 
-			busybox cp -p $PATH_DEX_DALVIK_APP_UPDATE /data/dalvik/$PATH_DEX_FIX
+			busybox cp -p $PATH_DEX_DALVIK_APP_UPDATE $PATH_DEX_FIX
 			busybox rm -f $PATH_DEX_DALVIK_APP_UPDATE
 			echo "¡Hecho!" 
 			echo "" 
@@ -689,14 +708,15 @@ function MOVER_DEX_DALVIK_APP(){
 			echo "" 
 			echo "Razón:" 
 			echo "El espacio máximo que queda en system/ es de: $ESPACIOSYSTEM Kb" 
-			echo "Pero el espacio mínimo requerido es de $SIZE_PATH_DALVIK_APP_UPDATE Kb" 
+			echo "Pero el espacio mínimo requerido es de $SIZE_PATH_DEX_DALVIK_APP_UPDATE Kb" 
 
 		fi
 	else
 		#Si la carpeta no era un enlace simbólico simplemente se le cambia parte del nombre de *data* a *system*
-		PATH_DEX_OLD=$(ls /data/dalvik-cache/data@app@$i??.apk@classes.dex)
-		PATH_DEX_FIX=$(echo $PATH_DEX_OLD | sed 's,/data@app@,/system@app@,g')
-		busybox mv $PATH_DEX_DALVIK_APP_UPDATE /data/dalvik/$PATH_DEX_FIX
+		PATH_DEX_OLD=$(ls /data/dalvik-cache/data@app@$i*.apk@classes.dex)
+		#PATH_DEX_FIX=$(echo $PATH_DEX_OLD | sed 's,/data@app@,/system@app@,g')
+		PATH_DEX_FIX="/data/dalvik-cache/system@app@$i.apk@classes.dex"
+		busybox mv $PATH_DEX_OLD $PATH_DEX_FIX
 		echo "¡Hecho!" 
 		echo "" 
 	fi
@@ -706,10 +726,13 @@ function MOVER_DEX_DALVIK_APP(){
 
 function CALCULAR_ESPACIO_PARA_APP(){
 
+
+
 	# Obtenemos el espacio libre en /system antes de hacer ninguna operación
 	ESPACIOSYSTEM=$(busybox df 2> /dev/null | grep "/dev/stl9" | awk '{ print $4 }')
 	if [ "$ESPACIOSYSTEM" == "" ]
 	then
+		echo ""
 		echo "No se pudo calcular el espacio que hay en /system/" 
 		SALIR
 	fi
@@ -718,6 +741,7 @@ function CALCULAR_ESPACIO_PARA_APP(){
 	SIZE_APP_UPDATE=$(busybox ls -s $PATH_APP_UPDATE 2> /dev/null | awk '{ print $1}')
 	if [ "$SIZE_APP_UPDATE" == "" ]
 	then
+		echo ""
 		echo "No se pudo calcular el tamaño de la actualización" 
 		SALIR
 	fi
@@ -726,6 +750,7 @@ function CALCULAR_ESPACIO_PARA_APP(){
 	SIZE_APP_ORIGINAL=$(busybox ls -s /system/app/$i.apk 2> /dev/null | awk '{ print $1}')
 	if [ "$SIZE_APP_ORIGINAL" == "" ]
 	then
+		echo ""
 		echo "No se pudo calcular el tamaño de la app original" 
 		echo "Eso puede indicar que no existe..." 
 		SALIR
@@ -735,6 +760,7 @@ function CALCULAR_ESPACIO_PARA_APP(){
 	SIZE_DELETE_ORIGINAL=`expr $ESPACIOSYSTEM + $SIZE_APP_ORIGINAL`
 	if [ "$SIZE_DELETE_ORIGINAL" == "" ]
 	then
+		echo ""
 		echo "No se pudo calcular el espacio que se podría liberar" 
 		SALIR
 	fi
@@ -759,7 +785,7 @@ function CALCULAR_ESPACIO_PARA_DEX(){
 		ESPACIOSYSTEM=$(busybox df 2> /dev/null | grep "/dev/stl9" | awk '{ print $4 }')
 
 		# Obtenemos el tamaño en Kb de la carpeta a la que se apuntaba:
-		SIZE_PATH_DALVIK_APP_UPDATE=$(busybox ls -s $PATH_DEX_DALVIK_APP_UPDATE | awk '{ print $1}')
+		SIZE_PATH_DEX_DALVIK_APP_UPDATE=$(busybox ls -s $PATH_DEX_DALVIK_APP_UPDATE | awk '{ print $1}')
 
 		# AQUÍ HAY QUE INTRUDUCIR UN CONTROL DE QUE NINGÚNO DE LOS VALORES ANTERIORES DEVE ESTAR VACÍO, SI ES ASÍ NO SE DEVERÍA CONTINUAR.
 	
@@ -770,7 +796,7 @@ function CALCULAR_ESPACIO_PARA_DEX(){
 		echo "Trabajo actual:" 
 		echo "La carpeta que se intenta mover a /data es: $PATH_DEX_DALVIK_APP_UPDATE" 
 		echo "El espacio actual en System es: $ESPACIOSYSTEM Kb" 
-		echo "Tamaño de la carpeta a mover es:   $SIZE_PATH_DALVIK_APP_UPDATE Kb" 
+		echo "Tamaño de la carpeta a mover es: $SIZE_PATH_DEX_DALVIK_APP_UPDATE Kb" 
 		echo "" 
 }
 
@@ -788,10 +814,10 @@ function UPDATES2SYSTEM_AUTO(){
 		# Si la variable con la nueva lista introducida por el usuario no está vacía se asignará a la 
 		# variable LISTAPPS y se mostrará un mensaje
 		LISTAPPS="$NEW_LIST"
-		echo
+		echo ""
 		echo "Preparándose para automatizar tareas para las APPS:"
 		echo "$LISTAPPS"
-		echo 
+		echo ""
 	else 
 
 		# Se lanza la función LIST_APPS_GCSETTINGS que intentará obtener valores para la variable LISTAPPS
