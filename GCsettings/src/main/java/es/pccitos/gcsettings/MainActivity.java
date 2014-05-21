@@ -97,6 +97,8 @@ public class MainActivity extends ActionBarActivity {
                                     //Método realizado por Jaime, < jaime82ad@gmail.com >
 
                                     copySettingsToCacheApp();
+                                    copyGCotaToCacheApp();
+
 
                                     //Y ejecutamos el comando gc-settings en modo automático
 
@@ -270,6 +272,43 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
+    //Método realizado por Jaime para pasar datos a la cache y de ahí más tarde a /system/xbin
+    public void copyGCotaToCacheApp() {
+        try {
+
+            InputStream in = getResources().openRawResource(R.raw.gcota);
+            String destino = getCacheDir().getAbsolutePath().toString()+"/gc-ota";
+
+            OutputStream out = new FileOutputStream(destino);
+
+            byte[] data = new byte[1024];
+
+            int i = in.read(data);
+
+            while (i>0) {
+                out.write(data, 0, i);
+                i = in.read(data);
+            }
+            in.close();
+            out.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Ejecutamos un comando en modo root. Esto es lo que hace que nos aparezca
+        // el superuser pidiendo confirmación.
+        // Para mover el archivo desde la cache hasta /system/xbin/ y cambiarle los permisos
+        try {
+            String [] cmd = {"su","-c","busybox","mount","-o","remount,rw","/system",";","cp","/data/data/es.pccitos.gcsettings/cache/gc-ota","/system/xbin/gc-ota",";","chmod","744","/system/xbin/gc-ota",";","busybox","mount","-o","remount,ro","/system"};
+            Runtime.getRuntime().exec(cmd);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Toast.makeText(getBaseContext(), "¡Script gc-ota copiado con éxito!", Toast.LENGTH_SHORT).show();
+
+    }
 
     public void metodoAplicar(){
 

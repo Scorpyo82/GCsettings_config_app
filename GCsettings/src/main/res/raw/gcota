@@ -1,0 +1,638 @@
+#!/system/bin/sh
+
+
+    #######################################
+    ##  Script realizado por Scorpyo82   ##
+    ##   Para la aplicación de ajustes   ##
+    ##  de la CustomROM GingerCerecilla  ##
+    #######################################
+
+#    gc-ota es un script que se encarga de
+#    comprobar las actualizaciones que pueda
+#    haber en el repositorio oficial de GingerCerecilla
+#
+#    También descargará las actualizaciones y prepara
+#    todo lo necesario para reiniciar e instalarla
+#
+#    Miguel Ponce Torres
+#    Copyright (C) <2014> <Miguel Ponce Torres>
+#    mail: miguelponcetorres@gmail.com
+#
+#    Aún así, no es totalmente necesario tener instalado
+#    la app "Ajustes especiales GC" ya que este Script
+#    Puede ser llamado mediante argumentos desde línea
+#    de comandos
+#
+#    Este Script y sus métodos están protegidos bajo licencia GNU GPL
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#
+#    Este script está diseñado para que funcione bajo sistemas
+#    rooteados y con busybox instalado.
+
+
+#VARIABLES
+
+# Esta variable define la versión del Script actual:
+VERSION="1.1"
+
+# Variable que define el archivo en el que se debe de escribir los datos recogidos del repositorio.
+PATH_XML="/data/data/es.pccitos.gcsettings/shared_prefs/OtaInfo.xml"
+
+# Ruta en la que se encuentra actualmente este Script.
+PATH_GCOTA="/system/xbin/gc-ota"
+
+# Nombre del archivo que se escribirá en init.d para activar CRON con las búsquedas programadas.
+PATH_FILE_INIT_D="/system/etc/init.d/08gc-ota"
+
+# Esta variable define el lugar donde se almacena el log generado, tenga en cuenta de que el script está preparado para escribir
+# en la partición /system si usté quiere generar el log en algún otro lugar deve de asegurarse de tener permisos de escritura.
+LOG="/system/gc-ota_$VERSION.log"
+
+# Variable que recoge el nombre en clave que debe tener el archivo que hace reaccionar al recovery selectivo para usar el
+# Recovery viejo en lugar del nuevo, si ustéd está usando un kernel que no tenga esta opción pero que sea compatible con 
+# los archivos "command" para autoinstalar los zip no deve de preocuparse en cambiar esta opción.
+KEY_RECOVERY_OLD="/cache/recovery/load-recovery-old"
+
+# Ruta raiz para los trabajos de la aplicación
+PATH_HOME="/sdcard/GC-OTA"
+
+# Ruta donde se descargará la lista de actualizaciones
+PATH_REPO_DOWNLOAD="/sdcard/GC-OTA/repo"
+
+# Ruta donde se descargarán los achivos de actualizaciones
+PATH_FILES_DOWNLOAD="/sdcard/GC-OTA/files"
+
+# Esta variable recogera de su build.prop el valor de la versión de la ROM actual 
+VERSION_GINGER=$(getprop gingercerecilla.version)
+
+# Esta variable recogera de su build.prop el valor del último update instalado o número de actualización realizada
+UPDATE_ACTUAL=$(getprop gingercerecilla.update)
+
+# Esta variable recogera de su build.prop el valor de la dirección hasta el repositorio en el que se descargará la información OTA
+URL_REPO=$(getprop gingercerecilla.url.repo)
+
+# Variable para el archivo de bloqueo que impedirá que la aplicación se ejecute dos veces al mismo tiempo.
+# El destino elegijo es recomendable no cambiarlo, pues si la aplicación se cuelga, el archivo de bloqueo en este lugar se borrará
+# trás un reinicio, con lo que podrá seguir usando despues de este el Script
+LOCKFILE=/cache/recovery/gc-ota.lock
+
+## FUNCIONES:
+
+function SALIR(){
+## Se borra el archivo de bloqueo y se monta system como solo lectura
+rm $LOCKFILE
+exit 1
+}
+
+function CHECK_RUN(){
+## Función que comprueba si existe el archivo de bloqueo
+## para que la aplicación no se ejecute dos veces
+
+	echo ""
+	if [ ! -e $LOCKFILE ]; then
+		# Si no existe el archivo de bloqueo se crea
+		# uno nuevo y se continua con la ejecución
+		touch $LOCKFILE
+	else
+		#Mensaje para comunicar que aún se están ejecutando tareas
+		echo ""
+		echo "El archivo de bloqueo de gc-ota aún exite"
+		echo "¿Está la aplicación en uso?"
+		exit
+	fi
+
+}
+
+function REPORT_FAIL(){
+## Escribe el xml con el fallo descrito en el argumento "$1"
+
+	echo "<?xml version='1.0' encoding='utf-8' standalone='yes' ?>" > $PATH_XML
+	echo "<map>" >> $PATH_XML
+	echo '<boolean name="preparado" value="true" />' >> $PATH_XML
+	echo '<boolean name="fallo" value="true" />' >> $PATH_XML
+	echo '<string name="motivo_fallo">'$1'</string>' >> $PATH_XML
+	echo "</map>" >> $PATH_XML
+
+}
+
+function VAR_CONTROL(){
+## Función para controlar que no haya ni una sola variable vacía de las importantes
+
+	if [ -z $VERSION_GINGER ] || [ -z $UPDATE_ACTUAL ] || [ -z $URL_REPO ]
+	then
+		echo ""
+		echo "Alguna de las variables en /system/build.prop no están definidas adecuadamente."
+		
+		#Si se llamó a la función con el argumento "APP" se dejará en el xml un registro de error y el motivo del fallo
+		if [ "$1" == "APP" ]
+		then
+			REPORT_FAIL "Alguna de las variables en /system/build.prop no están definidas adecuadamente."
+			SET_PERMISOS_XML
+			am start -a android.intent.action.MAIN -n es.pccitos.gcsettings/.OtaInfo
+		fi
+		SALIR
+	else
+		echo ""
+		echo "Datos de versión actual obtenidos con exito"
+		return 0
+	fi
+}
+
+
+function SET_PERMISOS_XML(){
+# Función que setéa los permisos
+	# Seteando permisos:
+	echo ""
+	echo "Estableciendo permisos para $PATH_XML"
+	PROPIETARIO=$(ls -dl /data/data/es.pccitos.gcsettings/shared_prefs | awk '{print $3}')
+	chown $PROPIETARIO $PATH_XML
+	chmod 660 $PATH_XML
+
+}
+
+
+function CHECK_NET(){
+## Función que comprueba el acceso a internet.
+
+	echo ""
+	echo "Comprobado el acceso al servidor web..."
+	ping -c 1 www.pc-citos.es
+	if [ $? == "0" ]
+	then
+		echo ""
+		echo "Disponibilidad del servidor web comprobado y correcto"
+	else
+		echo ""
+		echo "Problema con el acceso al servidor web"
+		
+		#Si se llamó a la función con el argumento "APP" se dejará en el xml un registro de error y el motivo del fallo
+		if [ "$1" == "APP" ]
+		then
+			REPORT_FAIL "Problema con el acceso al servidor web"
+			SET_PERMISOS_XML
+			am start -a android.intent.action.MAIN -n es.pccitos.gcsettings/.OtaInfo
+		fi
+		SALIR
+
+	fi
+}
+
+function CHECK_PATH_SD(){
+## Función que comprueba si existe la extructura adecuada dentro de la SD para copiar los archivos.
+	
+
+	for i in $PATH_HOME $PATH_FILES_DOWNLOAD $PATH_REPO_DOWNLOAD
+	do
+
+		if [ ! -e $i ]
+		then
+			echo ""
+			echo "Creando el direcotrio $i en la tarjeta SD..."
+			mkdir $i
+			
+			#Comprobamos si la operación se realizó con exito o ha habido algún problema
+			if [ "$?" == "0" ]
+			then
+				echo ""
+				echo "Directorios creado."
+			else
+				echo ""
+				echo "Se ha encontrado un problema a la hora de crear los archivos en la SD"
+	
+				#Si se llamó a la función con el argumento "APP" se dejará en el xml un registro de error y el motivo del fallo
+				if [ "$1" == "APP" ]
+				then
+					REPORT_FAIL "Problema al crear carpetas de trabajo en la SD"
+					SET_PERMISOS_XML
+					am start -a android.intent.action.MAIN -n es.pccitos.gcsettings/.OtaInfo
+				fi
+				SALIR
+	
+			fi
+	
+		else
+			echo ""
+			echo "Directorio $i detectado en la SD, omitiendo su creación..."
+		fi
+	done
+}
+
+function CHECK_PATH_XML(){
+## Función que comprueba si existe la ruta hasta llegar donde se deben de copiar los archivos XML.
+	
+	if [ ! -e /data/data/es.pccitos.gcsettings/shared_prefs ]
+	then
+		echo ""
+		echo "La ruta para escribir los xml no existe."
+		echo "Esto puede suceder por no tener la app correcta instalada"
+		echo "O por no haberla utilizado nunca"
+		SALIR
+	else
+		echo ""
+		echo "Ruta para copiar los archivos XML detectados."
+	fi
+}
+
+function DOWNLOAD_REPO(){
+## Función que actualiza el archivo de repositorio con las actualizaciones publicadas en el server
+	if [ "$1" == "APP" ]
+	then
+		CHECK_PATH_SD APP
+	else
+		CHECK_PATH_SD
+	fi
+
+	if [ -e "$PATH_REPO_DOWNLOAD/updates" ]
+	then
+		echo ""
+		echo "Eliminado repositorio antiguo"
+		rm  $PATH_REPO_DOWNLOAD/updates
+	fi
+	echo ""
+	echo "Descargando nuevo repositorio"
+	wget $URL_REPO -P $PATH_REPO_DOWNLOAD
+
+	if [ $? != "0" ]
+	then
+		echo ""
+		echo "No ha sido posible descargar el repositorio"
+		echo "Abortando"
+		
+		#Si se llamó a la función con el argumento "APP" se dejará en el xml un registro de error y el motivo del fallo
+		if [ "$1" == "APP" ]
+		then
+			REPORT_FAIL "No ha sido posible descargar el repositorio"
+			SET_PERMISOS_XML
+			am start -a android.intent.action.MAIN -n es.pccitos.gcsettings/.OtaInfo
+		fi
+		SALIR
+
+	fi
+
+}
+
+
+function SEARCH_UPDATE(){
+## Función que compara las versión actual del sistema, y la actualización corriente para buscar y seleccionar la actualización justo por encima.
+
+	if [ -e $PATH_REPO_DOWNLOAD/updates ]
+	then
+		# Generamos un archivo temporal limpio (sin líneas vacías ni títulos de columnas) del archivo de repo.
+		sed '1d' $PATH_REPO_DOWNLOAD/updates | sed '/^$/d' | sed '/./!d' > $PATH_REPO_DOWNLOAD/updates_temp
+
+		# Buscaremos línea a línea
+		echo "" 
+		echo "Buscando actualizaciones..."
+		encontrada=false
+		while read line
+		do
+			# Si en esta línea se encuentra la misma versión en la columna 1 y una actualización un número mayor en la columna 2 entonces
+			# se procede a anotar la dirección en la que está el paquete, su md5 y demás.
+			VERSION_ON_REPO=$(echo $line | awk '{print $1}')
+			UPDATE_ON_REPO=$(echo $line | awk '{print $2}')
+			if [ $VERSION_ON_REPO == $VERSION_GINGER ] && [ $UPDATE_ON_REPO -gt $UPDATE_ACTUAL ]
+			then
+				MD5SUM_ZIP_REPO=$(echo $line | awk '{print $3}')
+				LINK_UPDATE=$(echo $line | awk '{print $4}')
+				CHANGES=$(echo $line | awk '{print $5}' | sed 's/_/ /g')
+				
+				echo ""
+				echo "Se ha encontrado una actualización para la versión que está utilizando:"
+				echo "Actualización nº $UPDATE_ON_REPO para la versión $VERSION_GINGER"
+				echo "Cambios:"
+				echo $CHANGES
+				encontrada=true
+				break
+			fi
+		done < $PATH_REPO_DOWNLOAD/updates_temp
+
+		if [ $encontrada == false ]
+		then
+		
+			echo ""
+			echo "No se han encontrado actualizaciones, inténtelo más adelante"
+
+			
+			#Si se llamó a la función con el argumento "APP" se dejará en el xml un registro de error y el motivo del fallo
+			if [ "$1" == "APP" ]
+			then
+				REPORT_FAIL "No se han encontrado actualizaciones, inténtelo más adelante"
+				SET_PERMISOS_XML
+				am start -a android.intent.action.MAIN -n es.pccitos.gcsettings/.OtaInfo
+			fi
+			SALIR
+		fi
+
+
+	else
+		echo ""
+		echo "Actualmente no hay ningún fichero de repositorio descargado..."
+		echo "Use [gc-ota --update] para descargarlo desde el servidor web e inténtelo de nuevo"
+		
+		#Si se llamó a la función con el argumento "APP" se dejará en el xml un registro de error y el motivo del fallo
+		if [ "$1" == "APP" ]
+		then
+			REPORT_FAIL "Actualmente no hay ningún fichero de repositorio descargado..."
+			SET_PERMISOS_XML
+			am start -a android.intent.action.MAIN -n es.pccitos.gcsettings/.OtaInfo
+		fi
+		SALIR
+
+	fi
+	
+	return 0
+
+}
+
+function DOWNLOAD_UPDATEZIP(){
+## Función que descarga el update.zip
+
+	#Fijando el nombre del paquete:
+	UPDATEZIP="GC_v"$VERSION_GINGER"_Update_"$UPDATE_ON_REPO".zip"
+
+	#Descargando paquete
+	echo ""
+	echo "Descargando el $UPDATEZIP desde el origen:"
+	echo "$LINK_UPDATE"
+	echo ""
+	wget $LINK_UPDATE -O $PATH_FILES_DOWNLOAD/$UPDATEZIP
+
+	if [ $? != 0 ]
+	then
+		echo ""
+		echo "Ocurrión un error al descargar el archivo..."
+		echo "Abortado"
+		
+		#Si se llamó a la función con el argumento "APP" se dejará en el xml un registro de error y el motivo del fallo
+		if [ "$1" == "APP" ]
+		then
+			REPORT_FAIL "Ocurrión un error al descargar el archivo..."
+			SET_PERMISOS_XML
+			am start -a android.intent.action.MAIN -n es.pccitos.gcsettings/.OtaInfo
+		fi
+		SALIR
+
+	else
+		echo ""
+		echo "Archivo descargado con exito"
+	fi
+
+}
+
+function CHECK_MD5(){
+## Función que comprueba el md5 del update.zip y si es incorrecto lo borra para evitar problemas.
+
+	
+	#Obteniendo y comparando md5
+	MD5SUM_ZIP=$(md5sum $PATH_FILES_DOWNLOAD/$UPDATEZIP | awk '{print $1}')
+	if [ $MD5SUM_ZIP != $MD5SUM_ZIP_REPO ]
+	then
+		echo ""
+		echo "La suma de verificación del archivo descargado no coincide con la que se esperaba"
+		echo "¿¿Archivo corrupto??"
+		
+		#Si se llamó a la función con el argumento "APP" se dejará en el xml un registro de error y el motivo del fallo
+		if [ "$1" == "APP" ]
+		then
+			# Eliminamos el update zip y reportamos el fallo.
+			rm -f $PATH_FILES_DOWNLOAD/$UPDATEZIP 
+			REPORT_FAIL "La suma de verificación del archivo descargado no coincide con la que se esperaba"
+			SET_PERMISOS_XML
+			am start -a android.intent.action.MAIN -n es.pccitos.gcsettings/.OtaInfo
+		fi
+		SALIR
+
+	else
+		echo ""
+		echo "Suma de verificación exitosa"
+	fi
+}
+
+function PREPARE_REBOOT(){
+## Función que prepara todo lo necesario para actualizar el sistema con el nuevo update.zip
+
+	echo ""
+	
+	#Escribiendo archivo command con las ordenes de instalación:
+	echo "--update_package="$PATH_FILES_DOWNLOAD/$UPDATEZIP > /cache/recovery/command
+
+	#Escribiendo el archivo clave para que el sistema de encendido selectivo use el viejo binario de recovery 
+	touch $KEY_RECOVERY_OLD
+
+	echo "El sistema está listo para reiniciar en modo recovery y actualizarse de forma automática"
+	echo "Use [reboot recovery] para reiniciar en modo recovery"
+
+}
+
+function CHANGES_TO_XML(){
+## Función que genera un informe con los cambios encontrados para que sea leido por la app escogida
+
+	CHECK_PATH_XML #Se llama a esta función para saber si es posible llegar hasta la ruta donde se deben de copiar los XML
+
+	#Fijando el nombre del paquete a instalar:
+	UPDATEZIP="GC_v"$VERSION_GINGER"_Update_"$UPDATE_ON_REPO".zip"
+
+echo "Escribiendo el siguiente informe para que sea leido por la app..."
+
+	echo "##########################################################"
+echo "<?xml version='1.0' encoding='utf-8' standalone='yes' ?>"
+echo '<map>
+<boolean name="fallo" value="false" />
+<string name="motivo_fallo">Sin fallos</string>
+<boolean name="preparado" value="true" />
+<string name="version_rom_actual">Versión '$VERSION_GINGER'</string>
+<string name="update_ota">Revisión '$UPDATE_ON_REPO'</string>
+<string name="ota_changes">'$CHANGES'</string>
+<string name="update_package">'$UPDATEZIP'</string>
+</map>
+'
+	echo "##########################################################"
+
+
+echo "<?xml version='1.0' encoding='utf-8' standalone='yes' ?>" > $PATH_XML
+echo '<map>
+<boolean name="fallo" value="false" />
+<string name="motivo_fallo">Sin fallos</string>
+<boolean name="preparado" value="true" />
+<string name="version_rom_actual">Versión '$VERSION_GINGER'</string>
+<string name="update_ota">Revisión '$UPDATE_ON_REPO'</string>
+<string name="ota_changes">'$CHANGES'</string>
+<string name="update_package">'$UPDATEZIP'</string>
+</map>
+' >> $PATH_XML
+
+	echo ""
+	echo "Hecho!"
+
+	SET_PERMISOS_XML
+
+}
+
+function READY_XML(){
+## Función que escribe en el xml los valores que interpretará la app para que sepa que se terminó la descarga.
+
+echo "<?xml version='1.0' encoding='utf-8' standalone='yes' ?>" > $PATH_XML
+echo '<map>
+<boolean name="fallo" value="false" />
+<string name="motivo_fallo">Sin fallos</string>
+<boolean name="preparado" value="true" />
+<boolean name="reiniciar" value="true" />
+<string name="version_rom_actual">'$VERSION_GINGER'</string>
+<string name="update_ota">'$UPDATE_ON_REPO'</string>
+<string name="ota_changes">'$CHANGES'</string>
+<string name="update_package">'$UPDATEZIP'</string>
+</map>
+' >> $PATH_XML
+
+	SET_PERMISOS_XML
+
+}
+
+
+function HELP(){
+## Función que muestra la ahuda del Script
+
+	echo ""
+	echo "	gc-ota Version $VERSION"
+	echo '
+    Modo de empleo: gc-ota [Opción]
+
+    --check            Busca y muestra la información usando el último repo descargado
+    --update           Actualiza el repositorio, muestra información, pero no actualiza el sistema
+    --upgrade          Actualiza el sistema con la versión superior que esté disponible en el servidor
+    --version          Muestra la versión de gc-settings
+    --help             Muestra esta ayuda
+
+    --app [Opción]     Con esta opción se pretende interactuar usando el programa "Ajustes especiales GC"
+
+    Lista de opciones para --app:
+
+          update       Actualiza los repositorios y busca actualizacioens para luego mostrar el resultado en la app
+          upgrade      Actualiza el sistema con la versión superior que esté disponible y lo muestra en la app
+          discreet     Busca actualizaciones de forma discreta y solo lanza la APP si encuentra alguna actualización (no muestra errores)
+
+    Desarrollado por <Miguel Ponce Torres> bajo GNU GPL <http://www.gnu.org/licenses/>
+    MAIL: miguelponcetorres@gmail.com
+'
+
+}
+
+
+## Gestión de argumentos
+
+CHECK_RUN
+
+
+case $1 in
+
+	--app)
+
+		case $2 in
+
+			update)
+
+				#Descarga información del repositorio, comprueba versiones, crea el informe y lanza la app para instalar
+				VAR_CONTROL #Siempre comprobar que las variables se han podido leer con exito
+				CHECK_NET APP
+				DOWNLOAD_REPO APP
+				SEARCH_UPDATE APP
+				CHANGES_TO_XML APP
+				# Comando para abrir el OtaInfo
+				am start -a android.intent.action.MAIN -n es.pccitos.gcsettings/.OtaInfo
+			;;
+
+			upgrade)
+
+				sleep 2
+				VAR_CONTROL #Siempre comprobar que las variables se han podido leer con exito
+				CHECK_NET APP
+				DOWNLOAD_REPO APP
+				SEARCH_UPDATE APP		
+				DOWNLOAD_UPDATEZIP APP
+				CHECK_MD5 APP
+				PREPARE_REBOOT
+				READY_XML APP
+
+				# Comando para abrir el OtaInfo
+				am start -a android.intent.action.MAIN -n es.pccitos.gcsettings/.OtaInfo
+			;;
+
+			discreet)
+				#Descarga información del repositorio, comprueba versiones, crea el informe en modo sigiloso si y 
+				#lanza la app para instalar si encuentra actualizaciones
+				VAR_CONTROL #Siempre comprobar que las variables se han podido leer con exito
+				CHECK_NET
+				DOWNLOAD_REPO
+				SEARCH_UPDATE
+				if [ $? == "0" ]
+				then
+					CHANGES_TO_XML APP
+					# Comando para abrir el OtaInfo
+					am start -a android.intent.action.MAIN -n es.pccitos.gcsettings/.OtaInfo
+				fi
+			;;
+
+			*)
+				echo "No ha introducido ninguna opción para --app"
+				sleep 2
+				echo
+				HELP
+			;;
+
+		esac
+	;;
+
+	--check) #Busca información en el último repo descargado
+		echo "Buscando la última información sobre el repositorio actual..."
+		echo ""
+		VAR_CONTROL #Siempre comprobar que las variables se han podido leer con exito
+		SEARCH_UPDATE
+
+	;;
+
+	--update) #Actualiza el repositorio, muestra información, pero no actualiza el sistema
+		VAR_CONTROL #Siempre comprobar que las variables se han podido leer con exito
+		CHECK_NET
+		DOWNLOAD_REPO
+	;;
+	
+	--upgrade) # Actualiza el sistema con la versión superior encontrada
+		VAR_CONTROL #Siempre comprobar que las variables se han podido leer con exito
+		CHECK_NET
+		DOWNLOAD_REPO
+		SEARCH_UPDATE
+		DOWNLOAD_UPDATEZIP
+		CHECK_MD5
+		PREPARE_REBOOT
+	;;
+
+	--version)
+		echo "	gc-ota Version $VERSION"
+	;;
+
+	--help)
+		HELP
+	;;
+
+	*)
+		echo "Comando no reconocido"
+		sleep 1
+		HELP
+esac
+
+sync
+
+SALIR

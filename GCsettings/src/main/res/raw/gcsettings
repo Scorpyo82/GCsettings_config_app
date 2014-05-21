@@ -40,9 +40,9 @@
 #    rooteados y con busybox instalado.
 
 
-VERSION="1.0"
-VER="gc-settings_1.0"
-LOG="/data/$VER.log"
+VERSION="1.1"
+NAME="gc-settings"
+LOG="/data/$NAMME$VER.log"
 PATH_XML="/data/data/es.pccitos.gcsettings/shared_prefs/ajustesGC.xml"
 PATH_GCSETTINGS="/system/xbin/gc-settings"
 PATH_FILE_INIT_D="/system/etc/init.d/06gc-settings"
@@ -531,7 +531,7 @@ function LIST_APPS_GCSETTINGS(){
 }
 
 function KILL_APK(){
-## Función que cierra la aplicación antes de eliminar sus archivos
+## Función que deshabilita la aplicación antes de eliminar sus archivos
 	echo ""
 	echo "Buscando si la aplicación $i está en ejecución..."
 	echo "..."
@@ -539,7 +539,9 @@ function KILL_APK(){
 	if [ $? == "0" ]
 	then
 		echo "La aplicación está corriendo y se va a cerrar..."
-		kill $(ps | grep $i | awk '{print $2}')
+		#kill $(ps | grep $i | awk '{print $2}')
+		pm disable $i
+		
 		if [ $? == "0" ]
 		then
 			echo "¡Aplicación $i cerrada con éxito!"
@@ -614,7 +616,13 @@ function MOVER_APP(){
 		busybox chmod 644 /system/app/$i.apk
 		busybox chown root:root /system/app/$i.apk
 		echo "¡Hecho!" 
-		echo "" 
+		echo ""
+		echo "Corrigiendo permisos de $i" 
+		sh /sbin/fix_permissions -r -f $i
+		echo ""
+		echo "Relanzando app..."
+		pm enable $i
+		echo "Listo"
 		#echo "Montando systema como RO" 
 		#busybox mount -o remount,ro /system;
 
@@ -1067,6 +1075,7 @@ function HELP(){
     Ejemplo3: gc-settings --swap enable
 
     La apliación no permite más de un argumento, pero si varias opciones, como en el caso de --list
+
     Desarrollado por <Miguel Ponce Torres> bajo GNU GPL <http://www.gnu.org/licenses/>
     MAIL: miguelponcetorres@gmail.com
 '
