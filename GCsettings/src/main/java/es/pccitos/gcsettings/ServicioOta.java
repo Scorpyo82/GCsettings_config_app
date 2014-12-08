@@ -149,9 +149,10 @@ public class ServicioOta extends Service {
 
                 //Recargamos las variables con sus respectivos valores:
                 preparado = sharedPreferences.getBoolean(PREPARADO, false);
+                fallo = sharedPreferences.getBoolean(FALLO,true);
 
                 if (contadorSearchUpdates != contadorScan){
-                    if (preparado)
+                    if (preparado && !fallo)
 
                     //Abrimos OtaInfo mediante notificación
                     metodoNotificacion();

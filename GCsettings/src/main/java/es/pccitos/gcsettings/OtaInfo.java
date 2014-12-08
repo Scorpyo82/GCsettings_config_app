@@ -168,6 +168,23 @@ public class OtaInfo extends ActionBarActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 
+                //Obtiene el objeto de ajustes de la aplicación llamado ajustesGC.
+                SharedPreferences sharedPreferences = OtaInfo.this.getSharedPreferences("ajustesGC", 0);
+                
+                //Cambiamos el estado de sharepreferences
+                //Código que queremos que se ejecute tras la primera ejecución de la app
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                //Le indicamos que queremos que almacene un booleano de nombre inicializado con valor true
+                //Además, introducimos el resto de valores para los checbox por defecto, en este caso ajustados
+                //la CustomRom GingerCerecilla v0.8
+                editor.putBoolean(PREPARADO, true);
+
+                //Tras haber indicado todos los cambios a realizar (en este caso una configuración por defecto) le
+                //indicamos al editor que los almacene en las preferencias.
+                editor.commit();
+
+
                 //Se ejecuta el comando para actualizar
                 try {
                     String[] cmd = {"su","-c","reboot","recovery"};
