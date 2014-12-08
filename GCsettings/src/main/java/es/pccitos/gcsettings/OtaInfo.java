@@ -2,6 +2,9 @@ package es.pccitos.gcsettings;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
@@ -42,10 +45,18 @@ public class OtaInfo extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ota_info);
 
+        /** ANULADO PORQUE SE AUTOCANCELA DESDE ORIGEN
+        // Cancelamos la Notificacion que hemos comenzado
+        if (Context.NOTIFICATION_SERVICE!=null) {
+            String ns = Context.NOTIFICATION_SERVICE;
+            NotificationManager nMgr = (NotificationManager) getApplicationContext().getSystemService(ns);
+            nMgr.cancel(0);
+        }
+         **/
+
         //Declaración de los botones
         Button btActualizar = (Button) findViewById(R.id.btActualizar);
         Button btDescartar = (Button) findViewById(R.id.btSalir);
-
 
 
         metodoLoadPreferences();

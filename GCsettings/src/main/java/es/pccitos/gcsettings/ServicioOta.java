@@ -8,14 +8,12 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.RingtoneManager;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 import java.io.IOException;
 import java.util.Timer;
@@ -44,6 +42,18 @@ public class ServicioOta extends Service {
     public String ota_changes;
     public String update_package;
 
+    //Opciones presentes en OTA_Settings
+    public static String AUTO_CHECK_OTA = "auto_check_ota";
+
+    private static ServicioOta instance = null;
+
+    int notificationID = 1;
+
+
+    public static boolean isRunning() {
+        return instance !=null;
+    }
+
     @Override
 
     public void onCreate() {
@@ -58,10 +68,26 @@ public class ServicioOta extends Service {
 
     public int onStartCommand(Intent intent, int flags, int startID) {
 
-        Toast.makeText(this,"Servicio OTA Listo ",
-                Toast.LENGTH_SHORT).show();
-        metodoComprobarUpdates();
-        metodoUpdatesDisponibles();
+        //Obtiene el objeto de ajustes de la aplicación llamado ajustesGC.
+        SharedPreferences sharedPreferences = ServicioOta.this.getSharedPreferences("ajustesGC", 0);
+        //SharedPreferences sharedPreferences = getSharedPreferences("ajustesGC", 0);
+
+        //Obtenemos el booleano almacenado en las preferencias de nombre "inicializado".
+        //El segundo parametro indica el valor a devolver si no lo encuentra, en este caso, falso.
+        final boolean VG_AUTO_CHECK_OTA = sharedPreferences.getBoolean(AUTO_CHECK_OTA,false);
+
+        if(VG_AUTO_CHECK_OTA){
+            Toast.makeText(this,"Servicio OTA Listo ",
+                    Toast.LENGTH_SHORT).show();
+            metodoComprobarUpdates();
+            metodoUpdatesDisponibles();
+
+
+        }else{
+            stopService(new Intent(ServicioOta.this,
+                    ServicioOta.class));
+
+        }
 
         return START_STICKY;
 
@@ -134,7 +160,6 @@ public class ServicioOta extends Service {
     }
 
 
-    int notificationID = 1;
 
     private void metodoUpdatesDisponibles() {
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -168,8 +193,6 @@ public class ServicioOta extends Service {
 
     protected void metodoNotificacion(){
 
-
-
         //Obtiene el objeto de ajustes de la aplicación llamado OtaInfo.
         SharedPreferences sharedPreferences = ServicioOta.this.getSharedPreferences("OtaInfo", 0);
 
@@ -193,7 +216,9 @@ public class ServicioOta extends Service {
                 .setContentText(contentText)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .addAction(R.drawable.ic_launcher, ticker, pendingIntent)
-                .setVibrate(new long[] {100, 250, 100, 500})
+                .setVibrate(new long[]{100, 250, 100, 500})
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .setAutoCancel(true)
                 .build();
         nm.notify(notificationID, noti);
     }
