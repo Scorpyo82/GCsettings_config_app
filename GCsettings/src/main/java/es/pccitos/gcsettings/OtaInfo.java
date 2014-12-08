@@ -1,5 +1,6 @@
 package es.pccitos.gcsettings;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -157,7 +158,7 @@ public class OtaInfo extends ActionBarActivity {
         AlertDialog.Builder msgInstalarUpdate = new AlertDialog.Builder(this);
         msgInstalarUpdate.setCancelable(false);
         msgInstalarUpdate.setTitle("OTA Descarga terminada");
-        msgInstalarUpdate.setMessage("Ya se ha compleado la descarga de la actualización.\n\n" +
+        msgInstalarUpdate.setMessage("Ya se ha completado la descarga de la actualización.\n\n" +
                 "Puede reiniciar e instalar la actualización ahora o más tarde reiniciando " +
                 "en modo recovery. Si reinicia en modo normal se anulará la instalación.\n\n" +
                 "¿Quiere usted reiniciar e instalarlo ahora?");

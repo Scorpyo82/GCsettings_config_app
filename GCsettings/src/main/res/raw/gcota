@@ -580,8 +580,8 @@ case $1 in
 				if [ $? == "0" ]
 				then
 					CHANGES_TO_XML APP
-					# Comando para abrir el OtaInfo
-					am start -a android.intent.action.MAIN -n es.pccitos.gcsettings/.OtaInfo
+					# Comando para abrir el OtaInfo (capado)
+					# am start -a android.intent.action.MAIN -n es.pccitos.gcsettings/.OtaInfo
 				fi
 			;;
 

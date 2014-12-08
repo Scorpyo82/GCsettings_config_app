@@ -23,7 +23,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:checked="false"
-            android:enabled="false"
+            android:enabled="true"
             android:textColor="@color/cbColorText" />
 
         <TextView

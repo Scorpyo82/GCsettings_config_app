@@ -1,5 +1,6 @@
 package es.pccitos.gcsettings;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -47,6 +48,17 @@ public class OTA_Settings extends ActionBarActivity {
 
             }
         });
+
+        cbActivateOta.setOnClickListener(new View.OnClickListener() {
+            // Si se presiona sobre el botón se llama al método metodoServicioOta
+            // y es ahí donde se decide si se lanza el servicio o se para.
+
+            @Override
+            public void onClick(View view) {
+                metodoServicioOTA();
+            }
+        });
+
 
     }
 
@@ -103,5 +115,27 @@ public class OTA_Settings extends ActionBarActivity {
 
     }
 
+    public void metodoServicioOTA(){
 
+        //Declaración de los CheckBox
+        final CheckBox cbActivateOta = (CheckBox) findViewById(R.id.cbActivateOta);
+
+        //Faltan por añadir las condiciones para ejecutar este pedazo de código...
+        //Solo se deve activar si el checbox está activado.
+        //Si no lo está hay que matar el servicio.
+
+        if (cbActivateOta.isChecked()){
+            startService(new Intent(OTA_Settings.this,
+                    ServicioOta.class));
+            Toast.makeText(getBaseContext(), "¡Servicio ejcutándose!", Toast.LENGTH_SHORT).show();
+        }
+
+        if (!cbActivateOta.isChecked()){
+            stopService(new Intent(OTA_Settings.this,
+                    ServicioOta.class));
+            Toast.makeText(getBaseContext(), "¡Servicio destruido!", Toast.LENGTH_SHORT).show();
+
+        }
+
+    }
 }

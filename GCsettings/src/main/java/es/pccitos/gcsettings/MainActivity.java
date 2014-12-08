@@ -117,8 +117,6 @@ public class MainActivity extends ActionBarActivity {
 
         }
 
-
-
         //Cargar configuración para los CheckBox
         //Obtiene un booleano almacenado en las preferencias para cada
         //El segundo parametro indica el valor a devolver si no lo encuentra, en este caso, falso.
@@ -129,6 +127,7 @@ public class MainActivity extends ActionBarActivity {
         final boolean VG_SWAP = sharedPreferences.getBoolean(SWAP,false);
         final boolean VG_UPDATE2SYSTEM = sharedPreferences.getBoolean(OUPDATES2SYSTEM,false);
         final boolean VG_DATA2EXT = sharedPreferences.getBoolean(DATA2EXT,false);
+        final boolean VG_auto_check_ota = sharedPreferences.getBoolean(AUTO_CHECK_OTA,false);
 
 
         //Declaración de los CheckBox
@@ -172,6 +171,23 @@ public class MainActivity extends ActionBarActivity {
 
             }
         });
+
+        //Se comprueba si el servicio debería estár ejecutándose
+        if(VG_auto_check_ota)
+        {
+            startService(new Intent(MainActivity.this,
+                    ServicioOta.class));
+            //Toast.makeText(getBaseContext(), "¡Servicio OTA ejcutándose!", Toast.LENGTH_SHORT).show();
+        }
+
+
+        if(!VG_auto_check_ota)
+        {
+
+            stopService(new Intent(MainActivity.this,
+                    ServicioOta.class));
+            //Toast.makeText(getBaseContext(), "¡Servicio OTA está desactivado!", Toast.LENGTH_SHORT).show();
+        }
 
     }
 

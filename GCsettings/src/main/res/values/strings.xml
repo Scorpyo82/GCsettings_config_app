@@ -35,10 +35,7 @@
     <string name="action_settings">Settings</string>
     <string name="cbActivateOTA">Comprobar actualizaciones automáticas</string>
     <string name="btCheckUpdatesNow">¡Buscar actualizaciones ahora!</string>
-    <string name="tvInfoOTA">Activando esta opción crearás un servicio de comprobación automático y
-        periódico de actualizaciones. Cuando una nueva actualización sea encontrada esta misma
-        aplicación se lo notificará, le mostrará los datos de la nueva actualización y pedirá su
-        confirmación para instalarse.</string>
+    <string name="tvInfoOTA">Buscar actualizaciones en segunda plano. La aplicación generará un servicio llamado "Servicio OTA"</string>
     <string name="title_activity_ota_info">Información ota</string>
     <string name="tvVersionActual">Versión actual detectada:</string>
     <string name="tvUpdateDetect">Actualización encontrada:</string>
