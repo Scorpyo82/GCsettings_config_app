@@ -206,6 +206,22 @@ public class MainActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
 
+            case R.id.menu_memory_release:
+
+                //Ejecutamos un comando que se encarga de borrar los logs de /data/log/
+                try {
+                    //String [] cmd = {"su","-c","busybox","mount","-o","remount,rw","/system",";","busybox","rm","-rf","/data/log/*",";","busybox","mount","-o","remount,ro","/system"};
+
+                    String [] cmd = {"buxybox","rm","-rf","/data/log/*"};
+
+                    Runtime.getRuntime().exec(cmd);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                Toast.makeText(getBaseContext(), "¡Logs eliminados para recuperar espacio!", Toast.LENGTH_SHORT).show();
+                return true;
+
             case R.id.menu_list_apps:
 
                 Intent i = new Intent(this, ActivityListApps.class);

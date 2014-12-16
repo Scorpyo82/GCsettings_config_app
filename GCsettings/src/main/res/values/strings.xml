@@ -44,5 +44,6 @@
     <string name="tvChanges">Cambios:</string>
     <string name="btActualizar">Actualizar</string>
     <string name="btSalirOta">Descartar</string>
+    <string name="menu_memory_release">Intentar liberar memoria</string>
 
 </resources>
