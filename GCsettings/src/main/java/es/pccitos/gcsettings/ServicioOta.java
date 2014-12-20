@@ -59,15 +59,6 @@ public class ServicioOta extends Service {
     public void onCreate() {
 
         //Toast.makeText(this, "Servicio Iniciando" Toast.LENGTH_SHORT).show();
-
-    }
-
-
-
-    @Override
-
-    public int onStartCommand(Intent intent, int flags, int startID) {
-
         //Obtiene el objeto de ajustes de la aplicación llamado ajustesGC.
         SharedPreferences sharedPreferences = ServicioOta.this.getSharedPreferences("ajustesGC", 0);
         //SharedPreferences sharedPreferences = getSharedPreferences("ajustesGC", 0);
@@ -77,7 +68,7 @@ public class ServicioOta extends Service {
         final boolean VG_AUTO_CHECK_OTA = sharedPreferences.getBoolean(AUTO_CHECK_OTA,false);
 
         if(VG_AUTO_CHECK_OTA){
-            Toast.makeText(this,"Servicio OTA Listo ",
+            Toast.makeText(this,"Servicio OTA Activado ",
                     Toast.LENGTH_SHORT).show();
             metodoComprobarUpdates();
             metodoUpdatesDisponibles();
@@ -89,7 +80,18 @@ public class ServicioOta extends Service {
 
         }
 
+
+    }
+
+
+
+    @Override
+
+    public int onStartCommand(Intent intent, int flags, int startID) {
+
+
         return START_STICKY;
+
 
     }
 

@@ -180,9 +180,7 @@ public class MainActivity extends ActionBarActivity {
                         ServicioOta.class));
             //Toast.makeText(getBaseContext(), "¡Servicio OTA ejcutándose!", Toast.LENGTH_SHORT).show();
         }
-
-
-        if(!VG_AUTO_CHECK_OTA)
+        else
         {
 
             stopService(new Intent(MainActivity.this,

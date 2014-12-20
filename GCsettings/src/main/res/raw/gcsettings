@@ -40,9 +40,9 @@
 #    rooteados y con busybox instalado.
 
 
-VERSION="1.1"
+VERSION="1.2"
 NAME="gc-settings"
-LOG="/data/$NAMME$VER.log"
+LOG="/data/$NAMME_$VERSION.log"
 PATH_XML="/data/data/es.pccitos.gcsettings/shared_prefs/ajustesGC.xml"
 PATH_GCSETTINGS="/system/xbin/gc-settings"
 PATH_FILE_INIT_D="/system/etc/init.d/06gc-settings"
@@ -55,7 +55,7 @@ busybox mount -o remount,rw /system
 
 ## Imprimiendo la fecha
 date
-echo "" 
+echo ""
 
 ## CONJUNTO DE FUNCIONES:
 
@@ -64,14 +64,14 @@ function CHECK_RUN(){
 ## para que la aplicación no se ejecute dos veces
 
 	echo
-	
+
 	try=1
 	counter=1
 	while [ $try -le 3 ]
 	do
 		if [ ! -e $LOCKFILE ]; then
 			# Si no existe el archivo de bloqueo se crea
-			# crea uno nuevo y se continua con la ejecución
+			# uno nuevo y se continua con la ejecución
 			touch $LOCKFILE
 			break
 		else
@@ -101,30 +101,30 @@ function CHECK_RUN(){
 
 
 function CHECK_XML(){
-## Función que comrpueba si se encuentra el archivo de configuración 
+## Función que comrpueba si se encuentra el archivo de configuración
 ## ajusteGC.xml y si no se encuentra se aborta el script
 
 	if [ ! -e $PATH_XML ]
 	then
-		echo "No se encuentra archivo de configuración en la ruta:" 
-		echo "" 
-		echo "$PATH_XML" 
-		echo "" 
-		echo 'Este fichero se crea usando la APP "Ajustes Especiales GC" '
-		echo "Si la tiene instalada, úsela para crear su configuración." 
-		echo "Si no es así, puede usar gc-setting manualmente, para más "
-		echo "detalles consulte la ayuda [gc-settings --help]" 
+		echo "No se encuentra archivo de configuración en la ruta:"
 		echo ""
-		echo "Se aborta el argumento --auto" 
-		echo "" 
+		echo "$PATH_XML"
+		echo ""
+		echo 'Este fichero se crea usando la APP "Ajustes Especiales GC" '
+		echo "Si la tiene instalada, úsela para crear su configuración."
+		echo "Si no es así, puede usar gc-setting manualmente, para más "
+		echo "detalles consulte la ayuda [gc-settings --help]"
+		echo ""
+		echo "Se aborta el argumento --auto"
+		echo ""
 		SALIR
 	fi
 }
 
 function CHECK_GSETTINGS(){
-## Función que comprueba si existe el archivo para 
+## Función que comprueba si existe el archivo para
 ## ejecutar gc-settings al inicio en .../init.d/
-	
+
 	if [ ! -e $PATH_FILE_INIT_D ]
 	then
 		# Si no existe, se llama a la función correspondiente para crearlo
@@ -133,11 +133,11 @@ function CHECK_GSETTINGS(){
 }
 
 function CREATE_GCSETTINGS(){
-## Función para crear el archivo de gc-settins 
+## Función para crear el archivo de gc-settins
 ## en la carpeta .../init.d/
 	#busybox mount -o remount,rw /system
 
-	echo "Generando el script $PATH_FILE_INIT_D" 
+	echo "Generando el script $PATH_FILE_INIT_D"
 	echo "#!/system/bin/sh" > $PATH_FILE_INIT_D
 	echo "#" >> $PATH_FILE_INIT_D
 	echo "#Script autogenerado por gc-settings" >> $PATH_FILE_INIT_D
@@ -157,16 +157,16 @@ function GCSETTINGS_ENABLE(){
 	then
 		# Si el archivo no existe se llama a procedimiento que lo creará
 		CREATE_GCSETTINGS
-		echo "Generando un archivo de inicialización nuevo para gc-settings" 
+		echo "Generando un archivo de inicialización nuevo para gc-settings"
 		echo "!El archivo de inicialización creado no contiene ningún ajuste!"
-		echo "" 
+		echo ""
 	fi
-		
+
 	#busybox mount -o remount,rw /system
 	busybox chmod 755 $PATH_FILE_INIT_D
 	busybox chown root:root $PATH_FILE_INIT_D
 	#busybox mount -o remount,ro /system
-	echo "Activados los permisos de ejecución para $PATH_FILE_INIT_D " 
+	echo "Activados los permisos de ejecución para $PATH_FILE_INIT_D "
 	echo ""
 }
 
@@ -181,11 +181,11 @@ function GCSETTINGS_DESABLE(){
 		busybox chmod 644 $PATH_FILE_INIT_D
 		busybox chown root:root $PATH_FILE_INIT_D
 		#busybox mount -o remount,ro /system
-		echo "Desactivado permisos de ejecución para $PATH_FILE_INIT_D " 
-		
+		echo "Desactivado permisos de ejecución para $PATH_FILE_INIT_D "
+
 	else
 
-		echo "No hay nada que desactivar porque $PATH_FILE_INIT_D no existe" 
+		echo "No hay nada que desactivar porque $PATH_FILE_INIT_D no existe"
 
 	fi
 
@@ -225,10 +225,10 @@ function BOOTANIMATION_DESABLE(){
 ## Función para desactivar el bootanimation
 
 	#busybox mount -o remount,rw /system
-	echo "" 
-	echo "		## Animación y sonido de encendido ##" 
-	echo "" 
-	echo "Desactivando el uso de bootanimation y sonido de inicio..." 
+	echo ""
+	echo "		## Animación y sonido de encendido ##"
+	echo ""
+	echo "Desactivando el uso de bootanimation y sonido de inicio..."
 
 	# Controla que no se haya instalado otra animación de encendido mientras la original estaba desactivada
 	if [ -e /system/media/bootanimation.zip.off ] && [ -e /system/media/bootanimation.zip ]
@@ -241,9 +241,9 @@ function BOOTANIMATION_DESABLE(){
 	if [ -e /system/media/bootanimation.zip ]
 	then
 		mv /system/media/bootanimation.zip /system/media/bootanimation.zip.off
-		echo "Desactivado el uso de bootanimation" 
+		echo "Desactivado el uso de bootanimation"
 	else
-		echo "Bootanimation parece que ya estaba desactivado" 
+		echo "Bootanimation parece que ya estaba desactivado"
 	fi
 
 	# Controla que no se haya instalado otra sonido de encendido mientras la original estaba desactivada
@@ -257,16 +257,16 @@ function BOOTANIMATION_DESABLE(){
 	if [ -e /system/etc/poweron.ogg ]
 	then
 		mv /system/etc/poweron.ogg /system/etc/poweron.ogg.off
-		echo "Desactivado el uso del sonido al iniciar" 
+		echo "Desactivado el uso del sonido al iniciar"
 	else
-		echo "Sonido de encendido parece que ya estaba desactivado" 
+		echo "Sonido de encendido parece que ya estaba desactivado"
 	fi
 
 	LINE_BAD="$PATH_GCSETTINGS --bootanimation enable"
 	LINE_NEW="$PATH_GCSETTINGS --bootanimation desable"
 	CHECK_GSETTINGS
 	FIX_GCSETTINGS
-	
+
 }
 
 
@@ -274,25 +274,25 @@ function BOOTANIMATION_ENABLE(){
 ## Función para activar el bootanimation
 
 	#busybox mount -o remount,rw /system
-	echo "" 
-	echo "		## Animación y sonido de encendido ##" 
-	echo "" 
-	echo "Activando el uso de bootanimation y sonido de inicio..." 
+	echo ""
+	echo "		## Animación y sonido de encendido ##"
+	echo ""
+	echo "Activando el uso de bootanimation y sonido de inicio..."
 
 	if [ -e /system/media/bootanimation.zip.off ]
 	then
 		mv /system/media/bootanimation.zip.off /system/media/bootanimation.zip
-		echo "Reactivado el uso de bootanimation" 
+		echo "Reactivado el uso de bootanimation"
 	else
-		echo "Animación de encendido parece que ya estaba activado" 
+		echo "Animación de encendido parece que ya estaba activado"
 	fi
 
 	if [ -e /system/etc/poweron.ogg.off ]
 	then
 		mv /system/etc/poweron.ogg.off /system/etc/poweron.ogg
-		echo "Reactivado el uso de sonido al iniciar" 
+		echo "Reactivado el uso de sonido al iniciar"
 	else
-		echo "Sonido de inicio parece que ya estaba activado" 
+		echo "Sonido de inicio parece que ya estaba activado"
 	fi
 
 	LINE_BAD="$PATH_GCSETTINGS --bootanimation desable"
@@ -307,10 +307,10 @@ function SHUTDOWNANIMATION_DESABLE(){
 ## Función para desactivar el shutdownanimation
 
 	#busybox mount -o remount,rw /system
-	echo "" 
-	echo "		## Animación y sonido de apagado ##" 
-	echo "" 
-	echo "Desactivando el uso de shutdownanimation y sonido de apagado..." 
+	echo ""
+	echo "		## Animación y sonido de apagado ##"
+	echo ""
+	echo "Desactivando el uso de shutdownanimation y sonido de apagado..."
 
 	# Controla que no se haya instalado otra animación de apagado mientras la original estaba desactivada
 	if [ -e /system/media/video/shutdown/shutdown.qmg ] && [ -e /system/media/video/shutdown/shutdown.qmg.off ]
@@ -323,9 +323,9 @@ function SHUTDOWNANIMATION_DESABLE(){
 	if [ -e /system/media/video/shutdown/shutdown.qmg ]
 	then
 		mv /system/media/video/shutdown/shutdown.qmg /system/media/video/shutdown/shutdown.qmg.off
-		echo "Desactivado el uso de shotdownanimation" 
+		echo "Desactivado el uso de shotdownanimation"
 	else
-		echo "El shotdownanimation ya parece estar desactivado" 
+		echo "El shotdownanimation ya parece estar desactivado"
 	fi
 
 	# Controla que no se haya instalado otro sonido de apagado mientras la original estaba desactivado
@@ -338,9 +338,9 @@ function SHUTDOWNANIMATION_DESABLE(){
 	if [ -e /system/media/audio/ui/shutdown.ogg ]
 	then
 		mv /system/media/audio/ui/shutdown.ogg /system/media/audio/ui/shutdown.ogg.off
-		echo "Desactivado el uso de sonido al apagar" 
+		echo "Desactivado el uso de sonido al apagar"
 	else
-		echo "El sonido de apagado ya parece estar desactivado" 
+		echo "El sonido de apagado ya parece estar desactivado"
 	fi
 
 	LINE_BAD="$PATH_GCSETTINGS --shutdownanimation enable"
@@ -355,25 +355,25 @@ function SHUTDOWNANIMATION_ENABLE(){
 ## Función para activar el shutdownanimation
 
 	#busybox mount -o remount,rw /system
-	echo "" 
-	echo "		## Animación y sonido de apagado ##" 
-	echo "" 
-	echo "Activando el uso de shutdownanimation y sonido de apagado..." 
-	
+	echo ""
+	echo "		## Animación y sonido de apagado ##"
+	echo ""
+	echo "Activando el uso de shutdownanimation y sonido de apagado..."
+
 	if [ -e /system/media/video/shutdown/shutdown.qmg.off ]
 	then
 		mv /system/media/video/shutdown/shutdown.qmg.off /system/media/video/shutdown/shutdown.qmg
-		echo "Reactivado el uso de shotdownanimation" 
+		echo "Reactivado el uso de shotdownanimation"
 	else
-		echo "El shotdownanimation ya parece estar activado" 
+		echo "El shotdownanimation ya parece estar activado"
 	fi
-	
+
 	if [ -e /system/media/audio/ui/shutdown.ogg.off ]
 	then
 		mv /system/media/audio/ui/shutdown.ogg.off /system/media/audio/ui/shutdown.ogg
-		echo "Reactivado el uso de sonido al apagar" 
+		echo "Reactivado el uso de sonido al apagar"
 	else
-		echo "El sonido de apagado ya parece estar activado" 
+		echo "El sonido de apagado ya parece estar activado"
 	fi
 
 
@@ -389,19 +389,19 @@ function SWAP_DESABLE(){
 ## Función para desactivar la SWAP
 
 	#busybox mount -o remount,rw /system
-	echo "" 
-	echo "		## SWAP ##" 
-	echo "" 
-	echo "Desactivando el uso de Swap..." 
+	echo ""
+	echo "		## SWAP ##"
+	echo ""
+	echo "Desactivando el uso de Swap..."
 
 	# Busca y elimina todos los arhivos relacionados con swap o ram
-	echo "Eliminando scripts de terceros de Swap en init.d" 
+	echo "Eliminando scripts de terceros de Swap en init.d"
 	busybox find /system/etc/init.d -iname "*swap*" -type f -exec busybox rm -f {} \;
 	busybox find /system/etc/init.d -iname "*ram*" -type f -exec busybox rm -f {} \;
 
 	swapoff /dev/block/mmcblk0p3 2> /dev/null
-	echo "Swap desactivada" 
-	echo "" 
+	echo "Swap desactivada"
+	echo ""
 
 	LINE_BAD="$PATH_GCSETTINGS --swap enable"
 	LINE_NEW="$PATH_GCSETTINGS --swap desable"
@@ -414,23 +414,23 @@ function SWAP_ENABLE(){
 ## Función para activar la SWAP
 
 	#busybox mount -o remount,rw /system
-	echo "" 
-	echo "		## SWAP ##" 
-	echo "" 
-	echo "Activando el uso de Swap..." 
+	echo ""
+	echo "		## SWAP ##"
+	echo ""
+	echo "Activando el uso de Swap..."
 
 	# Busca y elimina todos los arhivos relacionados con swap o ram
 	busybox find /system/etc/init.d -iname "*swap*" -type f -exec busybox rm -f {} \;
 	busybox find /system/etc/init.d -iname "*ram*" -type f -exec busybox rm -f {} \;
 
-	echo "Eliminado scripts de terceros de Swap en init.d" 
+	echo "Eliminado scripts de terceros de Swap en init.d"
 
 	swapon /dev/block/mmcblk0p3 2> /dev/null
 	echo "40" > /proc/sys/vm/swappiness
 	echo "0,1,3,5,7,15" > /sys/module/lowmemorykiller/parameters/adj;
 	echo "1280,2560,5120,7680,12800,20480" > /sys/module/lowmemorykiller/parameters/minfree;
 
-	echo "Swap ya está activada" 
+	echo "Swap ya está activada"
 
 	LINE_BAD="$PATH_GCSETTINGS --swap desable"
 	LINE_NEW="$PATH_GCSETTINGS --swap enable"
@@ -443,8 +443,8 @@ function SWAP_ENABLE(){
 function UPDATE2SYSTEM_DESABLE(){
 ## Función para desactivar updates2system
 
-	echo "" 
-	echo "		## updates a /system/ ##" 
+	echo ""
+	echo "		## updates a /system/ ##"
 
 	echo "Desactivando actualizaciones a /system/"
 
@@ -459,8 +459,8 @@ function UPDATE2SYSTEM_DESABLE(){
 function UPDATE2SYSTEM_ENABLE(){
 ## Función para activar updates2system
 
-	echo "" 
-	echo "		## updates a /system/ ##" 
+	echo ""
+	echo "		## updates a /system/ ##"
 
 	echo "Activando actualizaciones a /system/"
 
@@ -470,7 +470,7 @@ function UPDATE2SYSTEM_ENABLE(){
 	FIX_GCSETTINGS
 }
 
-################# ZONA DE FUNCIONES DE UPDATES2SYSTEM ################# 
+################# ZONA DE FUNCIONES DE UPDATES2SYSTEM #################
 
     #######################################
     ##  Script realizado por Scorpyo82  ##
@@ -479,7 +479,7 @@ function UPDATE2SYSTEM_ENABLE(){
     #######################################
 
 #    updates2system es un script que se encarga
-#    de comprobar y mover actualizaciones de 
+#    de comprobar y mover actualizaciones de
 #    algunas aplicaciones instaladas en system
 #    Todo esto para ahorrar espacio en data.
 #
@@ -524,9 +524,9 @@ function LIST_APPS_GCSETTINGS(){
 			LISTAPPS=$(echo "$PRE_LIST" | sed -n -e '1x;1!H;${x;s-\n- -gp}')
 
 		else
-			
+
 			echo "No se ha encontrado ningúna aplicación definida"
-	
+
 		fi
 }
 
@@ -540,13 +540,14 @@ function KILL_APK(){
 	then
 		echo "La aplicación está corriendo y se va a cerrar..."
 		#kill $(ps | grep $i | awk '{print $2}')
+		ps | grep $i | awk '{print $2}' | xargs kill
 		pm disable $i
-		
+
 		if [ $? == "0" ]
 		then
-			echo "¡Aplicación $i cerrada con éxito!"
+			echo "¡Aplicación $i cerrada y bloqueada con éxito!"
 		else
-			echo "La apliación no se pudo cerrar adecuadamente"
+			echo "La apliación no se pudo bloqueada adecuadamente"
 		fi
 	else
 		echo "La aplicación no está ejecutándose."
@@ -557,12 +558,12 @@ function BUSCAR_APP(){
 ## Función que se encarga de buscar la ruta hacia la que apunta la APP que está en la variable $i
 
 
-	# Provisioionalmente almacenamos en la siguiente variable el valor NULL para 
+	# Provisioionalmente almacenamos en la siguiente variable el valor NULL para
 	# mas tarde comprobar que no se trata de un enlace sibólico
 	LINK_APP_UPDATE="NULL"
 
-	echo "" 
-	echo "Buscando actualizaciones de $i en /data/app " 
+	echo ""
+	echo "Buscando actualizaciones de $i en /data/app "
 	# Obtenemos la ruta real donde se encuentra el archivo suponiendo que no sea un enlace simbólico (si es que existe)
 	PATH_APP_UPDATE=$(busybox find /data/app/ -name "$i*.apk" -exec ls -al {} \; | awk '{ print $9}')
 	# Si no se obtubo ruta, se busca el archivo suponiendo que sea un enlace simbólico
@@ -570,8 +571,8 @@ function BUSCAR_APP(){
 	if [ "$PATH_APP_UPDATE" == "" ]
 	then
 
-		echo "No hay actualizaciones en /data/app" 
-		echo "Buscando ahora en /data/sdext2 por si fué movido por Link2SD o similar..." 
+		echo "No hay actualizaciones en /data/app"
+		echo "Buscando ahora en /data/sdext2 por si fué movido por Link2SD o similar..."
 		# Se guarda la ruta real donde se encuentra el archivo al que apunta el enlace simbólico encontrado
 		PATH_APP_UPDATE=$(busybox find /data/app/ -name "$i*.apk" -type l -exec ls -al {} \; | grep "data/sdext2/" | awk '{ print $11}')
 
@@ -582,7 +583,7 @@ function BUSCAR_APP(){
 	## Comprobamos si al fin se obtuvo una ruta válida
 	if [ "$PATH_APP_UPDATE" == "" ]
 	then
-		echo "No se pudo encontrar ningúna ruta hasta el archivo $i.apk" 
+		echo "No se pudo encontrar ningúna ruta hasta el archivo $i.apk"
 	fi
 }
 
@@ -594,46 +595,46 @@ function MOVER_APP(){
 
 	if [ $SIZE_DELETE_ORIGINAL -gt $SIZE_APP_UPDATE ]
 	then
-		
-		echo "Hay espacio para mover la actualización a system..." 
-		echo "Montando systema como RW" 
+
+		echo "Hay espacio para mover la actualización a system..."
+		echo "Montando systema como RW"
 		#busybox mount -o remount,rw /system;
-		
+
 		KILL_APK ## Se llama a esta función para cerrar la app antes de que se hagan operaciones
 
 		# Eliminando elnaces simbólicos de /data/app
 		echo ""
-		echo "Eliminando enlaces simbólicos si existen..." 
+		echo "Eliminando enlaces simbólicos si existen..."
 		busybox rm -f $(find /data/app/ -name "$i*.apk" -type l -exec ls -al {} \; | grep "data/sdext2/" | awk '{ print $9}')
 
 		# Eliminando archivo original
-		echo "Eliminando archivo original..." 
+		echo "Eliminando archivo original..."
 		busybox rm /system/app/$i.apk
 
 		# Moviendo archivo de /data/sdext2 o data/app a /system/app
-		echo "Moviendo update a system y ajustando permisos..." 
+		echo "Moviendo update a system y ajustando permisos..."
 		busybox mv $PATH_APP_UPDATE /system/app/$i.apk
 		busybox chmod 644 /system/app/$i.apk
 		busybox chown root:root /system/app/$i.apk
-		echo "¡Hecho!" 
+		echo "¡Hecho!"
 		echo ""
-		echo "Corrigiendo permisos de $i" 
+		echo "Corrigiendo permisos de $i"
 		sh /sbin/fix_permissions -r -f $i
 		echo ""
 		echo "Relanzando app..."
 		pm enable $i
 		echo "Listo"
-		#echo "Montando systema como RO" 
+		#echo "Montando systema como RO"
 		#busybox mount -o remount,ro /system;
 
 
 	else
 
-		echo "No hay espacio suficiente en /system para mover $i.apk" 
-		echo "" 
-		echo "Razón:" 
-		echo "El espacio máximo que se podría alcanzar es: $SIZE_DELETE_ORIGINAL Kb" 
-		echo "Pero el espacio mínimo requerido es de $SIZE_APP_UPDATE Kb" 
+		echo "No hay espacio suficiente en /system para mover $i.apk"
+		echo ""
+		echo "Razón:"
+		echo "El espacio máximo que se podría alcanzar es: $SIZE_DELETE_ORIGINAL Kb"
+		echo "Pero el espacio mínimo requerido es de $SIZE_APP_UPDATE Kb"
 
 	fi
 }
@@ -642,8 +643,8 @@ function MOVER_APP(){
 function BUSCAR_DEX_DALVIK(){
 
 	# Obtenemos la ruta real donde se encuentra el archivo dex de la aplicación suponiendo que sea un enlace simbólico (si es que existe)
-	echo "" 
-	echo "Buscando si existe archivo dex enlazado por Link2SD de $i en data/sdext2/dalvik-cache/ " 
+	echo ""
+	echo "Buscando si existe archivo dex enlazado por Link2SD de $i en data/sdext2/dalvik-cache/ "
 	PATH_DEX_DALVIK_APP_UPDATE=$(busybox find /data/dalvik-cache/ -name "data@app@$i*.apk@classes.dex" -type l -exec ls -al {} \; | grep "data/sdext2/dalvik-cache/" | awk '{ print $11}')
 
 	# Si no se obtuvo una ruta, se probará a buscar enlaces no simbólicos
@@ -655,8 +656,8 @@ function BUSCAR_DEX_DALVIK(){
 	else
 
 		DALVIK_LINK=false
-		echo "No hay hay enlaces de Link2SD a archivos dex de la aplicación en /data/dalvik-cache/" 
-		echo "Buscando ahora dex normales en /data/dalvik-cache" 
+		echo "No hay hay enlaces de Link2SD a archivos dex de la aplicación en /data/dalvik-cache/"
+		echo "Buscando ahora dex normales en /data/dalvik-cache"
 		# Obtenemos la ruta real donde se encuentra el archivo suponiendo que no sea un enlace simbólico (si es que existe)
 		PATH_DEX_DALVIK_APP_UPDATE=$(busybox find /data/dalvik-cache/ -name "data@app@$i*.apk@classes.dex" -exec ls -al {} \; | awk '{ print $9}')
 
@@ -665,9 +666,9 @@ function BUSCAR_DEX_DALVIK(){
 	## Comprobamos si al fin se obtuvo una ruta válida
 	if [ "$PATH_DEX_DALVIK_APP_UPDATE" == "" ]
 	then
-		echo "No se pudo encontrar ningúna archivo dex para la aplicación $i.apk" 
+		echo "No se pudo encontrar ningúna archivo dex para la aplicación $i.apk"
 	else
-		echo "Se pudo encontrar un archivo dex para la aplicación $i.apk" 
+		echo "Se pudo encontrar un archivo dex para la aplicación $i.apk"
 	fi
 }
 
@@ -684,39 +685,39 @@ function MOVER_DEX_DALVIK_APP(){
 
 		if [ $ESPACIOSYSTEM -gt $SIZE_PATH_DEX_DALVIK_APP_UPDATE ]
 		then
-		
-			echo "Hay espacio para mover la actualización a system..." 
-			echo "Montando systema como RW" 
+
+			echo "Hay espacio para mover la actualización a system..."
+			echo "Montando systema como RW"
 			#busybox mount -o remount,rw /system;
-			
+
 			# Obtenemos el nombre actual del archivo en /data/dalvik y la
 			# metemos en una variable que modificamos para que pertenezca a system
-			
+
 			PATH_DEX_OLD=$(ls /data/dalvik-cache/data@app@$i*.apk@classes.dex)
 			#PATH_DEX_FIX=$(echo $PATH_DEX_OLD | sed 's,/data@app@,/system@app@,g')
 			PATH_DEX_FIX="/data/dalvik-cache/system@app@$i.apk@classes.dex"
 
 			# Eliminando elnaces simbólicos de /data/app
-			echo "Eliminando enlaces simbólicos..." 
+			echo "Eliminando enlaces simbólicos..."
 			busybox rm -f $(find /data/dalvik-cache/ -name "data@app@$i*.apk@classes.dex" -type l -exec ls -al {} \; | grep "data/sdext2/" | awk '{ print $9}')
-	
+
 			# Copiando carpeta de /data/sdext2/ a data/ y conservando atributos
-			echo "Compiando DEX a /data/dalvik/ conservando atributos..." 
+			echo "Compiando DEX a /data/dalvik/ conservando atributos..."
 			busybox cp -p $PATH_DEX_DALVIK_APP_UPDATE $PATH_DEX_FIX
 			busybox rm -f $PATH_DEX_DALVIK_APP_UPDATE
-			echo "¡Hecho!" 
-			echo "" 
-			#echo "Montando systema como RO" 
+			echo "¡Hecho!"
+			echo ""
+			#echo "Montando systema como RO"
 			#busybox mount -o remount,ro /system;
 
 
 		else
 
-			echo "No hay espacio suficiente en /system para mover $PATH_DEX_OLD" 
-			echo "" 
-			echo "Razón:" 
-			echo "El espacio máximo que queda en system/ es de: $ESPACIOSYSTEM Kb" 
-			echo "Pero el espacio mínimo requerido es de $SIZE_PATH_DEX_DALVIK_APP_UPDATE Kb" 
+			echo "No hay espacio suficiente en /system para mover $PATH_DEX_OLD"
+			echo ""
+			echo "Razón:"
+			echo "El espacio máximo que queda en system/ es de: $ESPACIOSYSTEM Kb"
+			echo "Pero el espacio mínimo requerido es de $SIZE_PATH_DEX_DALVIK_APP_UPDATE Kb"
 
 		fi
 	else
@@ -725,8 +726,8 @@ function MOVER_DEX_DALVIK_APP(){
 		#PATH_DEX_FIX=$(echo $PATH_DEX_OLD | sed 's,/data@app@,/system@app@,g')
 		PATH_DEX_FIX="/data/dalvik-cache/system@app@$i.apk@classes.dex"
 		busybox mv $PATH_DEX_OLD $PATH_DEX_FIX
-		echo "¡Hecho!" 
-		echo "" 
+		echo "¡Hecho!"
+		echo ""
 	fi
 
 
@@ -738,19 +739,23 @@ function CALCULAR_ESPACIO_PARA_APP(){
 
 	# Obtenemos el espacio libre en /system antes de hacer ninguna operación
 	ESPACIOSYSTEM=$(busybox df 2> /dev/null | grep "/dev/stl9" | awk '{ print $4 }')
+	echo "Calculando espacio de system..."
 	if [ "$ESPACIOSYSTEM" == "" ]
 	then
 		echo ""
-		echo "No se pudo calcular el espacio que hay en /system/" 
+		echo "No se pudo calcular el espacio que hay en /system/"
 		SALIR
+	else
+		echo "Hecho!"
 	fi
 
 	# Obtenemos el tamaño en Kb del arcvhivo al que se apuntaba:
 	SIZE_APP_UPDATE=$(busybox ls -s $PATH_APP_UPDATE 2> /dev/null | awk '{ print $1}')
+	echo "Calculando tamaño de la actualización"
 	if [ "$SIZE_APP_UPDATE" == "" ]
 	then
 		echo ""
-		echo "No se pudo calcular el tamaño de la actualización" 
+		echo "No se pudo calcular el tamaño de la actualización"
 		SALIR
 	fi
 
@@ -759,9 +764,12 @@ function CALCULAR_ESPACIO_PARA_APP(){
 	if [ "$SIZE_APP_ORIGINAL" == "" ]
 	then
 		echo ""
-		echo "No se pudo calcular el tamaño de la app original" 
-		echo "Eso puede indicar que no existe..." 
-		SALIR
+		echo "No se pudo calcular el tamaño de la app original"
+		echo "Eso puede indicar que no existe..."
+
+		# Establecemos el tamaño de la app a cero (porque o existe)
+		SIZE_APP_ORIGINAL=0
+		#SALIR
 	fi
 
 	# Calculamos el espacio que quedaría en /system/ si eliminácemos la aplicación original:
@@ -769,21 +777,22 @@ function CALCULAR_ESPACIO_PARA_APP(){
 	if [ "$SIZE_DELETE_ORIGINAL" == "" ]
 	then
 		echo ""
-		echo "No se pudo calcular el espacio que se podría liberar" 
+		echo "No se pudo calcular el espacio que se podría liberar"
+		echo "Y por tanto no se puede mover la app"
 		SALIR
 	fi
 
 		# Si cabe en la partición de system entonces procedemos a eliminar el enlace simbólico, borrar el original y mover el nuevo.
-		echo "" 
-		echo "Cálculos para mover $i.apk" 
-		echo "" 
-		echo "Trabajo actual:" 
-		echo "El paquete que se intenta mover a /system es: $i" 
-		echo "La ruta en la que se encuentra su actualización es: $PATH_APP_UPDATE" 
-		echo "El espacio actual en System es: $ESPACIOSYSTEM Kb" 
-		echo "Tamaño del Update a mover es:   $SIZE_APP_UPDATE Kb" 
-		echo "Tamaño del paquete original:    $SIZE_APP_ORIGINAL Kb" 
-		echo "Borrando el original en system quedaría: $SIZE_DELETE_ORIGINAL Kb" 
+		echo ""
+		echo "Cálculos para mover $i.apk"
+		echo ""
+		echo "Trabajo actual:"
+		echo "El paquete que se intenta mover a /system es: $i"
+		echo "La ruta en la que se encuentra su actualización es: $PATH_APP_UPDATE"
+		echo "El espacio actual en System es: $ESPACIOSYSTEM Kb"
+		echo "Tamaño del Update a mover es:   $SIZE_APP_UPDATE Kb"
+		echo "Tamaño del paquete original:    $SIZE_APP_ORIGINAL Kb"
+		echo "Borrando el original en system quedaría: $SIZE_DELETE_ORIGINAL Kb"
 		echo ""
 }
 
@@ -796,16 +805,16 @@ function CALCULAR_ESPACIO_PARA_DEX(){
 		SIZE_PATH_DEX_DALVIK_APP_UPDATE=$(busybox ls -s $PATH_DEX_DALVIK_APP_UPDATE | awk '{ print $1}')
 
 		# AQUÍ HAY QUE INTRUDUCIR UN CONTROL DE QUE NINGÚNO DE LOS VALORES ANTERIORES DEVE ESTAR VACÍO, SI ES ASÍ NO SE DEVERÍA CONTINUAR.
-	
+
 		# Si cabe en la partición de /data/ entonces procedemos a eliminar el enlace simbólico, borrar el original y mover el nuevo.
-		echo "" 
-		echo "Cálculos para mover el archivo DEX de $i.apk" 
-		echo "" 
-		echo "Trabajo actual:" 
-		echo "La carpeta que se intenta mover a /data es: $PATH_DEX_DALVIK_APP_UPDATE" 
-		echo "El espacio actual en System es: $ESPACIOSYSTEM Kb" 
-		echo "Tamaño de la carpeta a mover es: $SIZE_PATH_DEX_DALVIK_APP_UPDATE Kb" 
-		echo "" 
+		echo ""
+		echo "Cálculos para mover el archivo DEX de $i.apk"
+		echo ""
+		echo "Trabajo actual:"
+		echo "La carpeta que se intenta mover a /data es: $PATH_DEX_DALVIK_APP_UPDATE"
+		echo "El espacio actual en System es: $ESPACIOSYSTEM Kb"
+		echo "Tamaño de la carpeta a mover es: $SIZE_PATH_DEX_DALVIK_APP_UPDATE Kb"
+		echo ""
 }
 
 
@@ -819,14 +828,14 @@ function UPDATES2SYSTEM_AUTO(){
 	if [ "$NEW_LIST" != "" ]  ## NEW_LIST es la variable que contiene el valor de $3 (argumento 3 pasado al script)
 	then
 
-		# Si la variable con la nueva lista introducida por el usuario no está vacía se asignará a la 
+		# Si la variable con la nueva lista introducida por el usuario no está vacía se asignará a la
 		# variable LISTAPPS y se mostrará un mensaje
 		LISTAPPS="$NEW_LIST"
 		echo ""
 		echo "Preparándose para automatizar tareas para las APPS:"
 		echo "$LISTAPPS"
 		echo ""
-	else 
+	else
 
 		# Se lanza la función LIST_APPS_GCSETTINGS que intentará obtener valores para la variable LISTAPPS
 		# a partir de la configuración generada con la app para android "Ajustes Especiales GC"
@@ -843,7 +852,7 @@ function UPDATES2SYSTEM_AUTO(){
 
 			if [ "$?" == "0" ]
 			then
-				
+
 				# Si es cierto que existe una lista creada manualmente, se toma como variable el contenido de dicha lista
 				LISTAPPS=$(grep "LISTAPPS=" $PATH_GCSETTINGS 1> /dev/null| sed 's/LISTAPPS=/g')
 				echo
@@ -864,7 +873,7 @@ function UPDATES2SYSTEM_AUTO(){
 
 
 
-	## Ahora se genera un bucle que irá obteniendo los valores de $LISTAPPS y 
+	## Ahora se genera un bucle que irá obteniendo los valores de $LISTAPPS y
 	## los irá comprobando llamando a cada función para generar los cambios
 	for i in $LISTAPPS
 	do
@@ -874,34 +883,34 @@ function UPDATES2SYSTEM_AUTO(){
 		# Si la ruta no contiene una cadena vacía procedemos a intentar mover la aplicación
 		if [ "$PATH_APP_UPDATE" != "" ]
 		then
-			
+
 			echo "¡¡ Se ha encontrado una actualización de la aplicación $i.apk !!"
 			echo ""
 			MOVER_APP #Llama a la función para mover la aplicación
 			BUSCAR_DEX_DALVIK #Llama a la función para buscar el archivo .dex de la aplicación
 			sync
-	
+
 			if [ "$PATH_DEX_DALVIK_APP_UPDATE" != "" ]
 			then
-	
+
 				MOVER_DEX_DALVIK_APP #Llama a la función de mover el archivo dex de la aplicación
 				sync
-	
+
 			else
-	
-				echo "No se ha encontrado ningún arhivo '.dex' de la aplicación $i.apk para ser movida" 
-				echo "" 
+
+				echo "No se ha encontrado ningún arhivo '.dex' de la aplicación $i.apk para ser movida"
+				echo ""
 			fi
 		else
 
-			echo "No se ha encontrado actualizaciones de la aplicación $i.apk" 
-			echo "" 
+			echo "No se ha encontrado actualizaciones de la aplicación $i.apk"
+			echo ""
 
 		fi
 	done;
 
 
-	# Borramos cualquier linea que contenga la palabra "LISTAPPS=" del archivo de .../init.d 
+	# Borramos cualquier linea que contenga la palabra "LISTAPPS=" del archivo de .../init.d
 	#busybox sed -e '/^LISTAPPS=/d' "$PATH_GCSETTINGS"
 	busybox sed "/LISTAPPS=/d" -i $PATH_FILE_INIT_D
 
@@ -910,23 +919,23 @@ function UPDATES2SYSTEM_AUTO(){
 	CHECK_GSETTINGS
 	FIX_GCSETTINGS
 
-	#echo "Montando systema como RO" 
+	#echo "Montando systema como RO"
 	#busybox mount -o remount,ro /system;
 }
 
-################ Fin del script 06gc_updates2system ################ 
+################ Fin del script 06gc_updates2system ################
 
 ## Función para desactivar el uso de updates2system
 function UPDATES2SYSTEM_DESABLE(){
 
 	#busybox mount -o remount,rw /system
-	echo "" 
-	echo "		## Updates2system ##" 
-	echo "" 
-	echo "Desactivando el uso de updates2system..." 
+	echo ""
+	echo "		## Updates2system ##"
+	echo ""
+	echo "Desactivando el uso de updates2system..."
 
-	echo "Updates2system desactivada" 
-	echo "" 
+	echo "Updates2system desactivada"
+	echo ""
 
 	LINE_BAD="$PATH_GCSETTINGS --updates2system auto"
 	LNE_NEW="$PATH_GCSETTINGS --updates2system desable"
@@ -939,13 +948,13 @@ function UPDATES2SYSTEM_DESABLE(){
 function UPDATES2SYSTEM_ENABLE(){
 
 	#busybox mount -o remount,rw /system
-	echo "" 
-	echo "		## Updates2system ##" 
-	echo "" 
-	echo "Activando el uso de updates2system..." 
+	echo ""
+	echo "		## Updates2system ##"
+	echo ""
+	echo "Activando el uso de updates2system..."
 
-	echo "Updates2system activada" 
-	echo "" 
+	echo "Updates2system activada"
+	echo ""
 
 	LINE_BAD="$PATH_GCSETTINGS --updates2system desable"
 	LINE_NEW="$PATH_GCSETTINGS --updates2system auto"
@@ -959,7 +968,7 @@ function UPDATES2SYSTEM_ENABLE(){
 function AUTO(){
 
 	CHECK_XML #Se llama a esa función para asegurarnos de que existe el fichero de autoconfiguración
-	
+
 	# Montamos /system con permisos de escritura RW
 
 	CREATE_GCSETTINGS #Se llama a esta función para generar un archivo nuevo y en blanco en .../init.d/
@@ -1026,7 +1035,7 @@ function AUTO(){
 		UPDATES2SYSTEM_DESABLE #Se llama a esta función para desactivar UPDATES2SYSTEM
 	fi
 
-		
+
 }
 
 
@@ -1046,7 +1055,7 @@ function HELP(){
 	echo ""
 	echo "	gc-settings Version $VERSION"
 	echo '
-    Modo de empleo: gc-settings [Opción] ... [Argumento] 
+    Modo de empleo: gc-settings [Opción] ... [Argumento]
 
     --enable                              Habilita el script de /init.d/ para autorranque.
     --desable                             Desactiva el script de /init.d/ para autorranque.
@@ -1065,7 +1074,7 @@ function HELP(){
     --updates2system desable                         Para desactivar el autoarranque al encender el teléfono.
     --updates2system --list [lista de packages]      Para pasar una lista de paquetes a intentar mover a /system/ separadas por espacios.
     --updates2system --search [nombre de package]    Busca un paquete en concreto (sin hacer operaciones).
-	
+
 
     --version             Muestra la versión de gc-settings
     --help                Muestra esta ayuda
@@ -1090,8 +1099,8 @@ case $1 in
 		then
 			GCSETTINGS_ENABLE
 		else
-			echo "La opción --enable no permite argumentos"	
-		fi	
+			echo "La opción --enable no permite argumentos"
+		fi
 	;;
 
 	--desable)
@@ -1100,10 +1109,10 @@ case $1 in
 		then
 			GCSETTINGS_DESABLE
 		else
-			echo "La opción --desable no permite argumentos"	
+			echo "La opción --desable no permite argumentos"
 		fi
 	;;
-	
+
 	--bootanimation)
 
 		case $2 in
@@ -1226,7 +1235,7 @@ case $1 in
 			;;
 		esac
 	;;
-	
+
 	--version)
 
 		echo "gc-settigs versión: $VERSION"
